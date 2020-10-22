@@ -12,9 +12,12 @@
 #include "audio/external.h"
 
 #include "gfx/gfx_pc.h"
+
 #include "gfx/gfx_opengl.h"
 #include "gfx/gfx_direct3d11.h"
 #include "gfx/gfx_direct3d12.h"
+
+#include "gfx/gfx_dxgi.h"
 #include "gfx/gfx_sdl.h"
 
 #include "audio/audio_api.h"
@@ -35,6 +38,8 @@
 #ifdef DISCORDRPC
 #include "pc/discord/discordrpc.h"
 #endif
+
+#include "text/text-loader.h"
 
 OSMesg D_80339BEC;
 OSMesgQueue gSIEventMesgQueue;
@@ -72,7 +77,13 @@ void send_display_list(struct SPTask *spTask) {
     gfx_run((Gfx *)spTask->task.t.data_ptr);
 }
 
-#define printf
+#ifdef VERSION_EU
+#define SAMPLES_HIGH 656
+#define SAMPLES_LOW 640
+#else
+#define SAMPLES_HIGH 544
+#define SAMPLES_LOW 528
+#endif
 
 void produce_one_frame(void) {
     gfx_start_frame();
@@ -86,9 +97,9 @@ void produce_one_frame(void) {
     thread6_rumble_loop(NULL);
 
     int samples_left = audio_api->buffered();
-    u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? 544 : 528;
+    u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
     //printf("Audio samples: %d %u\n", samples_left, num_audio_samples);
-    s16 audio_buffer[544 * 2 * 2];
+    s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
     for (int i = 0; i < 2; i++) {
         /*if (audio_cnt-- == 0) {
             audio_cnt = 2;
@@ -98,7 +109,7 @@ void produce_one_frame(void) {
     }
     //printf("Audio samples before submitting: %d\n", audio_api->buffered());
 
-    audio_api->play((u8*)audio_buffer, 2 * num_audio_samples * 4);
+    audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
 
     gfx_end_frame();
 }
@@ -118,6 +129,7 @@ void game_deinit(void) {
     controller_shutdown();
     audio_shutdown();
     gfx_shutdown();
+    dealloc_dialog_pool();
     inited = false;
 }
 
@@ -162,16 +174,17 @@ static void on_anim_frame(double time) {
 }
 #endif
 
-void main_func(void) {
+void main_func(char *argv[]) {
     static u64 pool[0x165000/8 / 4 * sizeof(void *)];
     main_pool_init(pool, pool + sizeof(pool) / sizeof(pool[0]));
     gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
 
     const char *gamedir = gCLIOpts.GameDir[0] ? gCLIOpts.GameDir : FS_BASEDIR;
-    const char *userpath = gCLIOpts.SavePath[0] ? gCLIOpts.SavePath : sys_user_path();
+    const char *userpath = gCLIOpts.SavePath[0] ? gCLIOpts.SavePath : sys_user_path();    
     fs_init(sys_ropaths, gamedir, userpath);
-
     configfile_load(configfile_name());
+
+    alloc_dialog_pool(argv[0], gamedir);
 
     if (gCLIOpts.FullScreen == 1)
         configWindow.fullscreen = true;
@@ -187,10 +200,10 @@ void main_func(void) {
     #endif
 
     #if defined(RAPI_D3D11)
-    rendering_api = &gfx_d3d11_api;
+    rendering_api = &gfx_direct3d11_api;
     # define RAPI_NAME "DirectX 11"
     #elif defined(RAPI_D3D12)
-    rendering_api = &gfx_d3d12_api;
+    rendering_api = &gfx_direct3d12_api;
     # define RAPI_NAME "DirectX 12"
     #elif defined(RAPI_GL) || defined(RAPI_GL_LEGACY)
     rendering_api = &gfx_opengl_api;
@@ -204,9 +217,11 @@ void main_func(void) {
     #endif
 
     char window_title[96] =
-    "Super Mario 64 PC port (" RAPI_NAME ")"
+    "Super Mario 64 Render96ex (" RAPI_NAME ")"
     #ifdef NIGHTLY
     " nightly " GIT_HASH
+    #else
+    " " GIT_HASH
     #endif
     ;
 
@@ -223,18 +238,15 @@ void main_func(void) {
     audio_init();
     sound_init();
 
-    thread5_game_loop(NULL);
-
+    thread5_game_loop(NULL);    
     inited = true;
 
-#ifdef EXTERNAL_DATA
     // precache data if needed
     if (configPrecacheRes) {
         fprintf(stdout, "precaching data\n");
         fflush(stdout);
         gfx_precache_textures();
     }
-#endif
 
 #ifdef DISCORDRPC
     discord_init();
@@ -255,6 +267,6 @@ void main_func(void) {
 
 int main(int argc, char *argv[]) {
     parse_cli_opts(argc, argv);
-    main_func();
+    main_func(argv);
     return 0;
 }

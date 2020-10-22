@@ -1,17 +1,9 @@
-#ifndef _MACROS_H_
-#define _MACROS_H_
+#ifndef MACROS_H
+#define MACROS_H
 
 #include "platform_info.h"
 
-#ifndef __sgi
 #define GLOBAL_ASM(...)
-#endif
-
-#if !defined(__sgi) && (!defined(NON_MATCHING) || !defined(AVOID_UB))
-// asm-process isn't supported outside of IDO, and undefined behavior causes
-// crashes.
-#error Matching build is only possible on IDO; please build with NON_MATCHING=1.
-#endif
 
 #define ARRAY_COUNT(arr) (s32)(sizeof(arr) / sizeof(arr[0]))
 
@@ -23,6 +15,13 @@
 #define UNUSED __attribute__((unused))
 #else
 #define UNUSED
+#endif
+
+// Avoid undefined behaviour for non-returning functions
+#ifdef __GNUC__
+#define NORETURN __attribute__((noreturn))
+#else
+#define NORETURN
 #endif
 
 // Static assertions
@@ -70,4 +69,4 @@
 # define LE_TO_HOST32(x) (x)
 #endif
 
-#endif
+#endif // MACROS_H

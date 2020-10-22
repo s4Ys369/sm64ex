@@ -1,14 +1,14 @@
-#include <ultra64.h>
+#include <PR/ultratypes.h>
 
-#include "sm64.h"
-#include "gfx_dimensions.h"
-#include "engine/math_util.h"
-#include "memory.h"
 #include "area.h"
+#include "engine/math_util.h"
+#include "geo_misc.h"
+#include "gfx_dimensions.h"
+#include "level_update.h"
+#include "memory.h"
 #include "save_file.h"
 #include "segment2.h"
-#include "level_update.h"
-#include "geo_misc.h"
+#include "sm64.h"
 
 
 /**
@@ -50,9 +50,9 @@ struct Skybox {
     /// The camera's pitch, which is bounded by +-16384, which maps to -90 to 90 degrees
     s16 pitch;
     /// The skybox's X position in world space
-    s32 scaledX;
+    f32 scaledX;
     /// The skybox's Y position in world space
-    s32 scaledY;
+    f32 scaledY;
 
     /// The index of the upper-left tile in the 3x3 grid that gets drawn
     s32 upperLeftTile;
@@ -60,30 +60,17 @@ struct Skybox {
 
 struct Skybox sSkyBoxInfo[2];
 
-typedef const u8 *const SkyboxTexture[80];
-
-extern SkyboxTexture bbh_skybox_ptrlist;
-extern SkyboxTexture bidw_skybox_ptrlist;
-extern SkyboxTexture bitfs_skybox_ptrlist;
-extern SkyboxTexture bits_skybox_ptrlist;
-extern SkyboxTexture ccm_skybox_ptrlist;
-extern SkyboxTexture cloud_floor_skybox_ptrlist;
-extern SkyboxTexture clouds_skybox_ptrlist;
-extern SkyboxTexture ssl_skybox_ptrlist;
-extern SkyboxTexture water_skybox_ptrlist;
-extern SkyboxTexture wdw_skybox_ptrlist;
-
-SkyboxTexture *sSkyboxTextures[10] = {
-    &water_skybox_ptrlist,
-    &bitfs_skybox_ptrlist,
-    &wdw_skybox_ptrlist,
-    &cloud_floor_skybox_ptrlist,
-    &ccm_skybox_ptrlist,
-    &ssl_skybox_ptrlist,
-    &bbh_skybox_ptrlist,
-    &bidw_skybox_ptrlist,
-    &clouds_skybox_ptrlist,
-    &bits_skybox_ptrlist,
+char * sSkyboxTextures[10] = {
+    "textures/skyboxes/water.rgba16",
+    "textures/skyboxes/bitfs.rgba16",
+    "textures/skyboxes/wdw.rgba16",
+    "textures/skyboxes/cloud_floor.rgba16",
+    "textures/skyboxes/ccm.rgba16",
+    "textures/skyboxes/ssl.rgba16",
+    "textures/skyboxes/bbh.rgba16",
+    "textures/skyboxes/bidw.rgba16",
+    "textures/skyboxes/clouds.rgba16",
+    "textures/skyboxes/bits.rgba16",
 };
 
 /**
@@ -119,11 +106,8 @@ u8 sSkyboxColors[][3] = {
  * The horizontal length of the skybox tilemap in tiles.
  */
 #define SKYBOX_COLS (10)
-/**
- * The vertical length of the skybox tilemap in tiles.
- */
-#define SKYBOX_ROWS (8)
 
+#define SKYBOX_IMAGE_SIZE (248)
 
 /**
  * Convert the camera's yaw into an x position into the scaled skybox image.
@@ -135,16 +119,14 @@ u8 sSkyboxColors[][3] = {
  *                 (how far is the camera rotated from 0, scaled 0 to 1)   *
  *                 (the screen width)
  */
-int calculate_skybox_scaled_x(s8 player, f32 fov) {
+f32 calculate_skybox_scaled_x(s8 player, f32 fov) {
     f32 yaw = sSkyBoxInfo[player].yaw;
 
     //! double literals are used instead of floats
-    f32 yawScaled = SCREEN_WIDTH * 360.0 * yaw / (fov * 65536.0);
-    // Round the scaled yaw. Since yaw is a u16, it doesn't need to check for < 0
-    s32 scaledX = yawScaled + 0.5;
+    f32 scaledX = SCREEN_WIDTH * 360.0 * yaw / (fov * 65536.0);
 
     if (scaledX > SKYBOX_WIDTH) {
-        scaledX -= scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH;
+        scaledX -= (s32) scaledX / SKYBOX_WIDTH * SKYBOX_WIDTH;
     }
     return SKYBOX_WIDTH - scaledX;
 }
@@ -155,17 +137,16 @@ int calculate_skybox_scaled_x(s8 player, f32 fov) {
  * fov may have been used in an earlier version, but the developers changed the function to always use
  * 90 degrees.
  */
-int calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
+f32 calculate_skybox_scaled_y(s8 player, UNUSED f32 fov) {
     // Convert pitch to degrees. Pitch is bounded between -90 (looking down) and 90 (looking up).
     f32 pitchInDegrees = (f32) sSkyBoxInfo[player].pitch * 360.0 / 65535.0;
 
     // Scale by 360 / fov
     f32 degreesToScale = 360.0f * pitchInDegrees / 90.0;
-    s32 roundedY = round_float(degreesToScale);
 
     // Since pitch can be negative, and the tile grid starts 1 octant above the camera's focus, add
     // 5 octants to the y position
-    s32 scaledY = roundedY + 5 * SKYBOX_TILE_HEIGHT;
+    f32 scaledY = degreesToScale + 5 * SKYBOX_TILE_HEIGHT;
 
     if (scaledY > SKYBOX_HEIGHT) {
         scaledY = SKYBOX_HEIGHT;
@@ -198,16 +179,16 @@ Vtx *make_skybox_rect(s32 tileIndex, s8 colorIndex) {
     s16 x = tileIndex % SKYBOX_COLS * SKYBOX_TILE_WIDTH;
     s16 y = SKYBOX_HEIGHT - tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT;
 
+    s16 w = SKYBOX_IMAGE_SIZE / (SKYBOX_COLS - 2);
+    s16 h = SKYBOX_IMAGE_SIZE / (SKYBOX_COLS - 2);
+    s16 tx = ((tileIndex % SKYBOX_COLS) * w) % SKYBOX_IMAGE_SIZE;
+    s16 ty = ((tileIndex / SKYBOX_COLS) * h) % SKYBOX_IMAGE_SIZE;
+
     if (verts != NULL) {
-        make_vertex(verts, 0, x, y, -1, 0, 0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1],
-                    sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 1, x, y - SKYBOX_TILE_HEIGHT, -1, 0, 31 << 5, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1],
-                    sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 2, x + SKYBOX_TILE_WIDTH, y - SKYBOX_TILE_HEIGHT, -1, 31 << 5, 31 << 5, sSkyboxColors[colorIndex][0],
-                    sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
-        make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y, -1, 31 << 5, 0, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1],
-                    sSkyboxColors[colorIndex][2], 255);
-    } else {
+        make_vertex(verts, 0, x, y, -1,                                          tx << 5,       ty << 5,       sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 1, x, y - SKYBOX_TILE_HEIGHT, -1,                     tx << 5,       (ty + w) << 5, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 2, x + SKYBOX_TILE_WIDTH, y - SKYBOX_TILE_HEIGHT, -1, (tx + w) << 5, (ty + h) << 5, sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
+        make_vertex(verts, 3, x + SKYBOX_TILE_WIDTH, y, -1,                      (tx + w) << 5, ty << 5,       sSkyboxColors[colorIndex][0], sSkyboxColors[colorIndex][1], sSkyboxColors[colorIndex][2], 255);
     }
     return verts;
 }
@@ -224,11 +205,13 @@ void draw_skybox_tile_grid(Gfx **dlist, s8 background, s8 player, s8 colorIndex)
     for (row = 0; row < 3; row++) {
         for (col = 0; col < 3; col++) {
             s32 tileIndex = sSkyBoxInfo[player].upperLeftTile + row * SKYBOX_COLS + col;
-            const u8 *const texture =
-                (*(SkyboxTexture *) segmented_to_virtual(sSkyboxTextures[background]))[tileIndex];
-            Vtx *vertices = make_skybox_rect(tileIndex, colorIndex);
+            char * texture = sSkyboxTextures[background];
+            s16 x = tileIndex % SKYBOX_COLS * SKYBOX_TILE_WIDTH;
+            s16 y = SKYBOX_HEIGHT - tileIndex / SKYBOX_COLS * SKYBOX_TILE_HEIGHT;
 
-            gLoadBlockTexture((*dlist)++, 32, 32, G_IM_FMT_RGBA, texture);
+            gLoadBlockTexture((*dlist)++, SKYBOX_IMAGE_SIZE, SKYBOX_IMAGE_SIZE, G_IM_FMT_RGBA, texture);
+
+            Vtx *vertices = make_skybox_rect(tileIndex, colorIndex);
             gSPVertex((*dlist)++, VIRTUAL_TO_PHYSICAL(vertices), 4, 0);
             gSPDisplayList((*dlist)++, dl_draw_quad_verts_0123);
         }
@@ -262,7 +245,7 @@ void *create_skybox_ortho_matrix(s8 player) {
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
-    s32 dlCommandCount = 5 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
+    s32 dlCommandCount = 7 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
     void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx));
     Gfx *dlist = skybox;
 
@@ -273,7 +256,13 @@ Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
 
         gSPDisplayList(dlist++, dl_skybox_begin);
         gSPMatrix(dlist++, VIRTUAL_TO_PHYSICAL(ortho), G_MTX_PROJECTION | G_MTX_MUL | G_MTX_NOPUSH);
-        gSPDisplayList(dlist++, dl_skybox_tile_tex_settings);
+
+        gSPMatrix(dlist++, &matrix_identity, G_MTX_MODELVIEW | G_MTX_LOAD | G_MTX_NOPUSH);
+        gSPTexture(dlist++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
+        gDPTileSync(dlist++);
+        gDPSetTile(dlist++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 8, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, 5, G_TX_NOLOD, G_TX_CLAMP, 5, G_TX_NOLOD);
+        gDPSetTileSize(dlist++, 0, 0, 0, (SKYBOX_IMAGE_SIZE - 1) << G_TEXTURE_IMAGE_FRAC, (SKYBOX_IMAGE_SIZE - 1) << G_TEXTURE_IMAGE_FRAC);
+
         draw_skybox_tile_grid(&dlist, background, player, colorIndex);
         gSPDisplayList(dlist++, dl_skybox_end);
         gSPEndDisplayList(dlist);

@@ -1,13 +1,9 @@
 #ifndef SEGMENT2_H
 #define SEGMENT2_H
 
-#include "types.h"
+#include <PR/ultratypes.h>
+#include <PR/gbi.h>
 
-extern u8 _segment2_mio0SegmentRomStart[];
-extern u8 _segment2_mio0SegmentRomEnd[];
-
-extern u8 seg2_course_name_table[];
-extern u8 seg2_act_name_table[];
 extern Gfx dl_rgba16_text_begin[];
 extern Gfx dl_rgba16_text_end[];
 extern Gfx dl_ia_text_begin[];
@@ -31,7 +27,7 @@ extern Gfx dl_shadow_9_verts[];
 extern Gfx dl_shadow_4_verts[];
 extern Gfx dl_shadow_end[];
 extern Gfx dl_skybox_begin[];
-extern Gfx dl_skybox_tile_tex_settings[];
+extern const Mtx matrix_identity;
 extern Gfx dl_skybox_end[];
 extern Gfx dl_waterbox_ia16_begin[];
 extern Gfx dl_waterbox_rgba16_begin[];
@@ -66,4 +62,4 @@ extern Gfx dl_billboard_num_7[];
 extern Gfx dl_billboard_num_8[];
 extern Gfx dl_billboard_num_9[];
 
-#endif /* SEGMENT2_H */
+#endif // SEGMENT2_H
