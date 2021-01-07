@@ -9,7 +9,6 @@
 #include <dirent.h>
 #include "libs/cJSON.h"
 #include "pc/configfile.h"
-#include "pc/fs/fs.h"
 
 #define MAX_LANG 30
 #define SECRET_NULL 24
@@ -30,7 +29,7 @@ void load_language(char *jsonTxt, s8 language) {
     cJSON *json = cJSON_ParseWithOpts(jsonTxt, &endTxt, 1);
 
     if(*endTxt != 0) {
-        fprintf(stderr, "Loading File: Error before: %s\n", cJSON_GetErrorPtr());
+        fprintf(stderr, "Loading File: Error before: %s\n", endTxt);
         exit(1);
     }
 
@@ -183,6 +182,68 @@ void load_language(char *jsonTxt, s8 language) {
     cJSON_Delete(json);
 }
 
+void alloc_languages(char *exePath, char *gamedir) {
+    languages = realloc(languages, sizeof(struct LanguageEntry*) * MAX_LANG);
+
+    char *lastSlash = NULL;
+    char *parent = malloc(FILENAME_MAX * sizeof(char*));
+    #ifndef WIN32
+    lastSlash = strrchr(exePath, '/');
+    #else
+    lastSlash = strrchr(exePath, '\\');
+    #endif
+    strncpy(parent, exePath, strlen(exePath) - strlen(lastSlash));
+    parent[strlen(exePath) - strlen(lastSlash)] = 0;
+
+    char *languagesDir = malloc(FILENAME_MAX * sizeof(char*));
+    #ifndef WIN32
+    strcpy(languagesDir, parent);
+    strcat(languagesDir, "/");
+    strcat(languagesDir, gamedir);
+    strcat(languagesDir, "/texts/");
+    #else
+    strcpy(languagesDir, parent);
+    strcat(languagesDir, "\\");
+    strcat(languagesDir, gamedir);
+    strcat(languagesDir, "\\texts\\");
+    #endif
+
+    DIR *lf = opendir(languagesDir);
+    struct dirent *de;
+    while ((de = readdir(lf)) != NULL) {
+        const char *extension = get_filename_ext(de->d_name);
+        if(strcmp(extension, "json") == 0) {
+            char *file = malloc(FILENAME_MAX * sizeof(char*));
+
+            strcpy(file, languagesDir);
+            strcat(file, de->d_name);
+            languagesAmount++;
+            printf("Loading File: %s\n", file);
+
+            char *jsonTxt = read_file(file);
+            if(jsonTxt != NULL) {
+                load_language(jsonTxt, languagesAmount - 1);
+            }else{
+                fprintf(stderr, "Loading File: Error reading '%s'\n", file);
+                exit(1);
+            }
+            free(jsonTxt);
+            free(file);
+        }
+    }
+
+    free(languagesDir);
+    free(parent);
+    closedir(lf);
+
+    if(languagesAmount > 0) {
+        languages = realloc(languages, sizeof(struct LanguageEntry*) * (languagesAmount));
+    }else{
+        fprintf(stderr, "Loading File: No language files found, aborting.\n");
+        exit(1);
+    }
+}
+
 struct LanguageEntry *get_language_by_name(char *name) {
     int id = 0;
 
@@ -224,39 +285,10 @@ u8 *get_key_string(char *id) {
     return tmp;
 }
 
-static bool alloc_language(void *user, const char *path) {
-    const char *extension = get_filename_ext(path);
-    if(strcmp(extension, "json") == 0) {        
-        languagesAmount++;
-        
-        fprintf(stderr, "Loading File '%s'\n", path);
-
-        u64 lngSize = 0;
-        char *jsonTxt = fs_load_file(path, &lngSize);
-        jsonTxt[lngSize] = '\0';
-        
-        if(jsonTxt != NULL) {
-            load_language(jsonTxt, languagesAmount - 1);
-        }else{
-            fprintf(stderr, "Loading File: Error reading '%s'\n", path);
-            exit(1);
-        }
-        free(jsonTxt);        
-    }
-    return true;
-}
-
 void alloc_dialog_pool(char *exePath, char *gamedir) {
-    languages = malloc(sizeof(struct LanguageEntry*) * 50);
+    languages = malloc(sizeof(struct LanguageEntry*));
 
-    fs_walk("texts", alloc_language, NULL, true);
-    
-     if(languagesAmount > 0) {
-        languages = realloc(languages, sizeof(struct LanguageEntry*) * (languagesAmount));
-    }else{
-        fprintf(stderr, "Loading File: No language files found, aborting.\n");
-        exit(1);
-    }
+    alloc_languages(exePath, gamedir);
 
     if(configLanguage >= languagesAmount) {
         printf("Loading File: Configured language doesn't exist, resetting to defaults.\n");
