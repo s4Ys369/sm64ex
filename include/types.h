@@ -118,6 +118,12 @@ struct GraphNodeObject_sub
     /*0x0A 0x42*/ u16 animTimer;
     /*0x0C 0x44*/ s32 animFrameAccelAssist;
     /*0x10 0x48*/ s32 animAccel;
+#ifdef HIGHFPS
+    s16 prevAnimFrame;
+    s16 prevAnimID;
+    u32 prevAnimFrameTimestamp;
+    struct Animation *prevAnimPtr;
+#endif
 };
 
 struct GraphNodeObject
@@ -133,6 +139,20 @@ struct GraphNodeObject
     /*0x4C*/ struct SpawnInfo *unk4C;
     /*0x50*/ Mat4 *throwMatrix; // matrix ptr
     /*0x54*/ Vec3f cameraToObject;
+
+#ifdef HIGHFPS
+    Vec3s prevAngle;
+    Vec3f prevPos;
+    u32 prevTimestamp;
+    Vec3f prevShadowPos;
+    u32 prevShadowPosTimestamp;
+    Vec3f prevScale;
+    u32 prevScaleTimestamp;
+    Mat4 prevThrowMatrix;
+    u32 prevThrowMatrixTimestamp;
+    Mat4 *throwMatrixInterpolated;
+    u32 skipInterpolationTimestamp;
+#endif
 };
 
 struct ObjectNode
@@ -243,6 +263,12 @@ struct Surface
     } normal;
     /*0x28*/ f32 originOffset;
     /*0x2C*/ struct Object *object;
+#ifdef HIGHFPS
+    Vec3s prevVertex1;
+    Vec3s prevVertex2;
+    Vec3s prevVertex3;
+    u32 modifiedTimestamp;
+#endif
 };
 
 struct MarioBodyState

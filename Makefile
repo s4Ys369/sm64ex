@@ -31,6 +31,8 @@ TARGET_BITS ?= 0
 BETTERCAMERA ?= 0
 # Disable no drawing distance by default
 NODRAWINGDISTANCE ?= 0
+# Disable 60 fps by default
+HIGHFPS ?= 0
 # Disable texture fixes by default (helps with them purists)
 TEXTURE_FIX ?= 0
 # Enable extended options menu by default
@@ -500,6 +502,12 @@ endif
 ifeq ($(NODRAWINGDISTANCE),1)
   CC_CHECK += -DNODRAWINGDISTANCE
   CFLAGS += -DNODRAWINGDISTANCE
+endif
+
+# Check for 60 fps option
+ifeq ($(HIGHFPS),1)
+  CC_CHECK += -DHIGHFPS
+  CFLAGS += -DHIGHFPS
 endif
 
 # Check for Discord Rich Presence option

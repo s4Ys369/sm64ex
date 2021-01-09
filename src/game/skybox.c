@@ -251,7 +251,12 @@ void *create_skybox_ortho_matrix(s8 player) {
  * Creates the skybox's display list, then draws the 3x3 grid of tiles.
  */
 Gfx *init_skybox_display_list(s8 player, s8 background, s8 colorIndex) {
+
+#ifdef HIGHFPS
+    s32 dlCommandCount = 124; // 5 for the start and end, plus 9 skybox tiles
+#else
     s32 dlCommandCount = 7 + (3 * 3) * 7; // 5 for the start and end, plus 9 skybox tiles
+#endif
     void *skybox = alloc_display_list(dlCommandCount * sizeof(Gfx));
     Gfx *dlist = skybox;
 

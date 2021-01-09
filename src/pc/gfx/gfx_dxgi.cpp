@@ -36,10 +36,19 @@
 
 #ifdef VERSION_EU
 #define FRAME_INTERVAL_US_NUMERATOR 40000
+#ifdef HIGHFPS
+#define FRAME_INTERVAL_US_DENOMINATOR 2
+#else
 #define FRAME_INTERVAL_US_DENOMINATOR 1
+#endif
+
 #else
 #define FRAME_INTERVAL_US_NUMERATOR 100000
+#ifdef HIGHFPS
+#define FRAME_INTERVAL_US_DENOMINATOR 6
+#else
 #define FRAME_INTERVAL_US_DENOMINATOR 3
+#endif
 #endif
 
 using namespace Microsoft::WRL; // For ComPtr
