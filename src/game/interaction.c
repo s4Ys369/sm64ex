@@ -24,6 +24,8 @@
 #include "sound_init.h"
 #include "thread6.h"
 
+#include "sgi/utils/characters.h"
+
 #define INT_GROUND_POUND_OR_TWIRL (1 << 0) // 0x01
 #define INT_PUNCH                 (1 << 1) // 0x02
 #define INT_KICK                  (1 << 2) // 0x04
@@ -112,7 +114,7 @@ static struct InteractionHandler sInteractionHandlers[] = {
     { INTERACT_UNKNOWN_08,     interact_unknown_08 },
     { INTERACT_CAP,            interact_cap },
     { INTERACT_GRABBABLE,      interact_grabbable },
-    { INTERACT_TEXT,           interact_text },
+    { INTERACT_TEXT,           interact_text }
 };
 
 static u32 sForwardKnockbackActions[][3] = {
@@ -351,8 +353,13 @@ void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
         save_file_set_cap_pos(m->pos[0], m->pos[1], m->pos[2]);
 
         m->flags &= ~(MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
-
-        capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+		
+		if(isLuigi()==1) {
+			capObject = spawn_object(m->marioObj, MODEL_LUIGIS_CAP, bhvNormalCap);
+		}
+		else {
+			capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+		}
 
         capObject->oPosY += (m->action & ACT_FLAG_SHORT_HITBOX) ? 120.0f : 180.0f;
         capObject->oForwardVel = capSpeed;
@@ -805,7 +812,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 
         m->numStars =
             save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-
+			
         if (!noExit) {
             drop_queued_background_music();
             fadeout_level_music(126);
@@ -870,6 +877,40 @@ u32 interact_warp(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->interactObj = o;
             m->usedObj = o;
 
+			if(o->oObjectID == 1){
+				o->oInteractStatus = INT_STATUS_INTERACTED;
+				m->interactObj = o;
+				m->usedObj = o;
+	
+				if (o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)) {
+					play_sound(SOUND_MENU_ENTER_PIPE, m->marioObj->header.gfx.cameraToObject);
+					queue_rumble_data(15, 80);
+				} else {
+					play_sound(SOUND_MENU_ENTER_HOLE, m->marioObj->header.gfx.cameraToObject);
+					queue_rumble_data(12, 80);
+				}
+	
+				mario_stop_riding_object(m);
+				play_transition(WARP_TRANSITION_FADE_INTO_MARIO, 0x15, 0x00, 0x00, 0x00);
+				u32 animation;
+	
+				if(m->numKeys >= 10){
+                    s32 characterModel = getCharacterType() == MARIO ? LUIGI : MARIO;
+                    setCharacterModel(characterModel);
+                    save_file_update_player_model(gCurrSaveFileNum - 1, characterModel);
+                    if (isLuigi()==1)
+                        gMarioState->animation = &Data_LuigiAnims;
+                    else
+                        gMarioState->animation = &D_80339D10;
+                    
+                    m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_PLAYER];	
+					animation = set_mario_action(m, ACT_CHARACTER_SWITCH, TRUE);
+				}else{
+					animation = set_mario_action(m, ACT_CHARACTER_SWITCH, FALSE);
+				}
+	
+				return animation;
+			}
             if (o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)) {
                 play_sound(SOUND_MENU_ENTER_PIPE, m->marioObj->header.gfx.cameraToObject);
                 queue_rumble_data(15, 80);

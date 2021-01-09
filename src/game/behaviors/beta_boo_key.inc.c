@@ -20,6 +20,44 @@
  * of the same object. It is a less developed version of
  * bhvBetaBooKey, hence the "alpha" moniker.
  */
+#include <sys/time.h>
+#include "../../sgi/utils/characters.h"
+
+int modifier = 0;
+
+void validate_key(){
+	if(save_file_taken_key(gCurrSaveFileNum - 1, o->oObjectID)){
+        cur_obj_become_intangible();
+        cur_obj_disable_rendering();
+        obj_mark_for_deletion(o);
+    }
+}
+
+void bhv_key_init(void) {
+	o->oPosY += 80;	
+	o->oObjectID = (s32) o->oBehParams;    
+	validate_key();
+}
+
+void bhv_beta_boo_key_loop(void) {
+	o->oFaceAngleYaw += 0x700;
+    o->oPosY += sin(o->oFaceAngleYaw / (20 * 1000)) * 2;
+	if (obj_check_if_collided_with_object(o, gMarioObject)) {
+		// Delete the object and spawn sparkles
+		obj_mark_for_deletion(o);
+		spawn_object(o, MODEL_SPARKLES, bhvGoldenCoinSparkles);
+        cur_obj_play_sound_2(SOUND_OBJ_BIG_PENGUIN_YELL);
+		gMarioState->numKeys++;
+        save_file_register_key(gCurrSaveFileNum - 1, o->oObjectID);
+
+        if(gMarioState->numKeys >= 10){
+            triggerLuigiNotification();
+        }		
+	}
+}
+
+
+ /*
 void bhv_alpha_boo_key_loop(void) {
     // Rotate the key
     o->oFaceAngleRoll += 0x200;
@@ -49,6 +87,7 @@ void bhv_alpha_boo_key_loop(void) {
 /**
  * Continue to make the key fall, and handle collection.
  */
+ /*
 static void beta_boo_key_dropped_loop(void) {
     // Apply standard physics to the key
     cur_obj_update_floor_and_walls();
@@ -102,11 +141,12 @@ static void beta_boo_key_dropped_loop(void) {
         }
     }
 }
-
+*/
 /**
  * Drop the key. This function is run once, the frame after the boo dies;
  * It immediately sets the action to BETA_BOO_KEY_ACT_DROPPED.
  */
+ /*
 static void beta_boo_key_drop(void) {
     s16 velocityDirection;
     f32 velocityMagnitude;
@@ -140,10 +180,11 @@ static void beta_boo_key_drop(void) {
     o->oFaceAngleYaw += 0x200;
     o->oFaceAngleRoll += 0x200;
 }
-
+*/
 /**
  * Update the key to be inside its parent boo, and handle the boo dying.
  */
+ /*
 static void beta_boo_key_inside_boo_loop(void) {
     // Update the key to be inside the boo at all times
     struct Object *parent = o->parentObj;
@@ -162,13 +203,16 @@ static void beta_boo_key_inside_boo_loop(void) {
     o->oFaceAngleRoll += 0x200;
     o->oFaceAngleYaw += 0x200;
 }
-
+*/
+/*
 static void (*sBetaBooKeyActions[])(void) = { beta_boo_key_inside_boo_loop, beta_boo_key_drop,
                                               beta_boo_key_dropped_loop };
 
 /**
  * Update function for bhvBetaBooKey.
  */
+ /*
 void bhv_beta_boo_key_loop(void) {
     cur_obj_call_action_function(sBetaBooKeyActions);
 }
+*/

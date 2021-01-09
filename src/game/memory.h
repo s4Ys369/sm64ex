@@ -20,6 +20,7 @@ struct AllocOnlyPool
 
 struct MemoryPool;
 struct MarioAnimation;
+struct LuigiAnimation;
 struct Animation;
 
 #ifndef INCLUDED_FROM_MEMORY_C
@@ -62,4 +63,9 @@ void *alloc_display_list(u32 size);
 void func_80278A78(struct MarioAnimation *a, void *b, struct Animation *target);
 s32 load_patchable_table(struct MarioAnimation *a, u32 b);
 
+void func_luigiunk(struct LuigiAnimation *a, void *b, struct Animation *target);
+s32 load_patchable_luigi_table(struct LuigiAnimation *a, u32 b);
+
+
+extern uintptr_t sSegmentROMTable[32];
 #endif // MEMORY_H

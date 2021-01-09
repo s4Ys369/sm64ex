@@ -23,6 +23,7 @@
 #include "save_file.h"
 #include "skybox.h"
 #include "sound_init.h"
+#include "sgi/utils/characters.h"
 
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
@@ -390,9 +391,13 @@ Gfx *geo_mario_tilt_torso(s32 callContext, struct GraphNode *node, UNUSED Mat4 *
             && action != ACT_RIDING_SHELL_GROUND) {
             vec3s_copy(bodyState->torsoAngle, gVec3sZero);
         }
-        rotNode->rotation[0] = bodyState->torsoAngle[1];
-        rotNode->rotation[1] = bodyState->torsoAngle[2];
-        rotNode->rotation[2] = bodyState->torsoAngle[0];
+        if (isLuigi()==1){
+        }
+        else {
+            rotNode->rotation[0] = bodyState->torsoAngle[1];
+            rotNode->rotation[1] = bodyState->torsoAngle[2];
+            rotNode->rotation[2] = bodyState->torsoAngle[0];
+        }
     }
     return NULL;
 }

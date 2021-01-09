@@ -1,14 +1,14 @@
-################################################################################
-############################### SM64PC Makefile ################################
-################################################################################
 
-## Default target ##
+# Makefile to rebuild SM64 split image
+
+### Default target ###
+
 default: all
 
-################################ Build Options #################################
+### Build Options ###
 
-## These options can either be changed by modifying the makefile, or
-## by building with 'make SETTING=value'. 'make clean' may be required.
+# These options can either be changed by modifying the makefile, or
+# by building with 'make SETTING=value'. 'make clean' may be required.
 
 # Build debug version
 DEBUG ?= 0
@@ -18,32 +18,40 @@ VERSION ?= us
 GRUCODE ?= f3dex2e
 # If NON_MATCHING is 1, define the NON_MATCHING and AVOID_UB macros when building (recommended)
 NON_MATCHING ?= 1
+
 # Build and optimize for Raspberry Pi(s)
 TARGET_RPI ?= 0
+
 # Build for Emscripten/WebGL
 TARGET_WEB ?= 0
+
 # Makeflag to enable OSX fixes
 OSX_BUILD ?= 0
+
 # Specify the target you are building for, TARGET_BITS=0 means native
 TARGET_ARCH ?= native
 TARGET_BITS ?= 0
+
 # Disable better camera by default
 BETTERCAMERA ?= 0
 # Disable no drawing distance by default
 NODRAWINGDISTANCE ?= 0
 # Disable 60 fps by default
 HIGHFPS ?= 0
+# Disable HD Model code (Like billboard removal) by default
+MODELPACK ?= 0
 # Disable texture fixes by default (helps with them purists)
 TEXTURE_FIX ?= 0
 # Enable extended options menu by default
 EXT_OPTIONS_MENU ?= 1
 # Enable Discord Rich Presence
 DISCORDRPC ?= 0
+
 # Various workarounds for weird toolchains
 NO_BZERO_BCOPY ?= 0
 NO_LDIV ?= 0
 
-## Backend selection
+# Backend selection
 
 # Renderers: GL, GL_LEGACY, D3D11, D3D12
 RENDER_API ?= GL
@@ -54,18 +62,14 @@ AUDIO_API ?= SDL2
 # Controller backends (can have multiple, space separated): SDL2
 CONTROLLER_API ?= SDL2
 
-## External assets
-
-# Asset directory
-BASEDIR ?= res
-# Create zip file with legacy assets
 LEGACY_RES ?= 0
-# Copy assets to BASEDIR? (useful for iterative debugging)
-NO_COPY ?= 0
+BASEDIR ?= res
 
-################################# OS Detection #################################
+# Automatic settings for PC port(s)
 
 WINDOWS_BUILD ?= 0
+
+# Attempt to detect OS
 
 ifeq ($(OS),Windows_NT)
   HOST_OS ?= Windows
@@ -84,6 +88,7 @@ ifeq ($(TARGET_WEB),0)
 endif
 
 # MXE overrides
+
 ifeq ($(WINDOWS_BUILD),1)
   ifeq ($(CROSS),i686-w64-mingw32.static-)
     TARGET_ARCH = i386pe
@@ -93,32 +98,6 @@ ifeq ($(WINDOWS_BUILD),1)
     TARGET_ARCH = i386pe
     TARGET_BITS = 64
     NO_BZERO_BCOPY := 1
-  endif
-endif
-
-# macOS overrides
-ifeq ($(HOST_OS),Darwin)
-  OSX_BUILD := 1
-  # Using MacPorts?
-  ifeq ($(shell test -d /opt/local/lib && echo y),y)
-    OSX_GCC_VER = $(shell find /opt/local/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
-    CC := gcc-mp-$(OSX_GCC_VER)
-    CXX := g++-mp-$(OSX_GCC_VER)
-    CPP := cpp-mp-$(OSX_GCC_VER) -P
-    PLATFORM_CFLAGS := -I /opt/local/include
-    PLATFORM_LDFLAGS := -L /opt/local/lib
-  else
-    # Using Homebrew?
-    ifeq ($(shell which brew >/dev/null 2>&1 && echo y),y)
-      OSX_GCC_VER = $(shell find `brew --prefix`/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
-      CC := gcc-$(OSX_GCC_VER)
-      CXX := g++-$(OSX_GCC_VER)
-      CPP := cpp-$(OSX_GCC_VER) -P
-      PLATFORM_CFLAGS := -I /usr/local/include
-      PLATFORM_LDFLAGS := -L /usr/local/lib
-    else
-      $(error No suitable macOS toolchain found, have you installed Homebrew?)
-    endif
   endif
 endif
 
@@ -133,9 +112,11 @@ TARGET := sm64.$(VERSION)
 VERSION_CFLAGS := -D$(VERSION_DEF) -D_LANGUAGE_C
 VERSION_ASFLAGS := --defsym $(VERSION_DEF)=1
 
-# Stuff for showing the git hash in the title bar
-GIT_HASH := $(shell git rev-parse --short HEAD)
-VERSION_CFLAGS += -DGIT_HASH="\"$(GIT_HASH)\""
+# Stuff for showing the git hash in the intro
+# From https://stackoverflow.com/questions/44038428/include-git-commit-hash-and-or-branch-name-in-c-c-source
+GIT_HASH=`git rev-parse --short HEAD`
+COMPILE_TIME=`date -u +'%Y-%m-%d %H:%M:%S UTC'`
+VERSION_CFLAGS += -DGIT_HASH="\"$(GIT_HASH)\"" -DCOMPILE_TIME="\"$(COMPILE_TIME)\""
 
 ifeq ($(shell git rev-parse --abbrev-ref HEAD),nightly)
   VERSION_CFLAGS += -DNIGHTLY
@@ -155,7 +136,7 @@ ifeq ($(TARGET_RPI),1) # Define RPi to change SDL2 title & GLES2 hints
 endif
 
 ifeq ($(OSX_BUILD),1) # Modify GFX & SDL2 for OSX GL
-  VERSION_CFLAGS += -DOSX_BUILD
+     VERSION_CFLAGS += -DOSX_BUILD
 endif
 
 VERSION_ASFLAGS := --defsym AVOID_UB=1
@@ -180,14 +161,13 @@ else
   endif
 endif
 
-############################ Universal Dependencies ############################
+################### Universal Dependencies ###################
 
 # (This is a bit hacky, but a lot of rules implicitly depend
 # on tools and assets, and we use directory globs further down
 # in the makefile that we want should cover assets.)
 
 ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(MAKECMDGOALS),cleantools)
 ifneq ($(MAKECMDGOALS),distclean)
 
 # Make sure assets exist
@@ -200,16 +180,15 @@ endif
 endif
 
 # Make tools if out of date
-DUMMY != CC=$(CC) CXX=$(CXX) $(MAKE) -C tools >&2 || echo FAIL
+DUMMY != make -C tools >&2 || echo FAIL
 ifeq ($(DUMMY),FAIL)
   $(error Failed to build tools)
 endif
 
 endif
 endif
-endif
 
-######################### Target Executable and Sources ########################
+################ Target Executable and Sources ###############
 
 # BUILD_DIR is location where all build artifacts are placed
 BUILD_DIR_BASE := build
@@ -224,17 +203,17 @@ LIBULTRA := $(BUILD_DIR)/libultra.a
 
 ifeq ($(TARGET_WEB),1)
 EXE := $(BUILD_DIR)/$(TARGET).html
-  else
-  ifeq ($(WINDOWS_BUILD),1)
-    EXE := $(BUILD_DIR)/$(TARGET).exe
+	else
+	ifeq ($(WINDOWS_BUILD),1)
+		EXE := $(BUILD_DIR)/$(TARGET).exe
 
-    else # Linux builds/binary namer
-    ifeq ($(TARGET_RPI),1)
-      EXE := $(BUILD_DIR)/$(TARGET).arm
-    else
-      EXE := $(BUILD_DIR)/$(TARGET)
-    endif
-  endif
+		else # Linux builds/binary namer
+		ifeq ($(TARGET_RPI),1)
+			EXE := $(BUILD_DIR)/$(TARGET).arm
+		else
+			EXE := $(BUILD_DIR)/$(TARGET)
+		endif
+	endif
 endif
 
 ELF := $(BUILD_DIR)/$(TARGET).elf
@@ -248,7 +227,7 @@ LEVEL_DIRS := $(patsubst levels/%,%,$(dir $(wildcard levels/*/header.h)))
 # Directories containing source files
 
 # Hi, I'm a PC
-SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers actors levels bin data assets src/text src/text/libs src/pc src/pc/gfx src/pc/audio src/pc/controller src/pc/fs src/pc/fs/packtypes
+SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers actors levels bin data assets src/text src/text/libs src/pc src/pc/gfx src/pc/audio src/pc/controller src/pc/fs src/pc/fs/packtypes src/sgi src/sgi/utils
 
 ifeq ($(DISCORDRPC),1)
   SRC_DIRS += src/pc/discord
@@ -290,9 +269,9 @@ ifeq ($(TARGET_RPI),1)
                 model = $(shell sh -c 'cat /sys/firmware/devicetree/base/model 2>/dev/null || echo unknown')
 
                 ifneq (,$(findstring 3,$(model)))
-                        OPT_FLAGS := -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -O3
-                else
-                        OPT_FLAGS := -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -O3
+                         OPT_FLAGS := -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -O3
+                         else
+                         OPT_FLAGS := -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -O3
                 endif
         endif
 
@@ -301,9 +280,9 @@ ifeq ($(TARGET_RPI),1)
         ifneq (,$(findstring aarch64,$(machine)))
                 model = $(shell sh -c 'cat /sys/firmware/devicetree/base/model 2>/dev/null || echo unknown')
                 ifneq (,$(findstring 3,$(model)))
-                        OPT_FLAGS := -march=armv8-a+crc -mtune=cortex-a53 -O3
+                         OPT_FLAGS := -march=armv8-a+crc -mtune=cortex-a53 -O3
                 else ifneq (,$(findstring 4,$(model)))
-                        OPT_FLAGS := -march=armv8-a+crc+simd -mtune=cortex-a72 -O3
+                         OPT_FLAGS := -march=armv8-a+crc+simd -mtune=cortex-a72 -O3
                 endif
 
         endif
@@ -316,7 +295,7 @@ CXX_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 S_FILES := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.s))
 GODDARD_C_FILES := $(foreach dir,$(GODDARD_SRC_DIRS),$(wildcard $(dir)/*.c))
 
-GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/demo_data.c
+GENERATED_C_FILES := $(BUILD_DIR)/assets/mario_anim_data.c $(BUILD_DIR)/assets/luigi_anim_data.c $(BUILD_DIR)/assets/demo_data.c
 
 ULTRA_C_FILES := \
   alBnkfNew.c \
@@ -348,13 +327,13 @@ SOUND_SAMPLE_AIFCS := $(foreach file,$(SOUND_SAMPLE_AIFFS),$(BUILD_DIR)/$(file:.
 SOUND_OBJ_FILES := $(SOUND_BIN_DIR)/sound_data.o
 
 # Object files
-O_FILES :=  $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
-            $(foreach file,$(CXX_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
-            $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
-            $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o))
+O_FILES := $(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
+           $(foreach file,$(CXX_FILES),$(BUILD_DIR)/$(file:.cpp=.o)) \
+           $(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
+           $(foreach file,$(GENERATED_C_FILES),$(file:.c=.o))
 
-ULTRA_O_FILES :=  $(foreach file,$(ULTRA_S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
-                  $(foreach file,$(ULTRA_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
+ULTRA_O_FILES := $(foreach file,$(ULTRA_S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
+                 $(foreach file,$(ULTRA_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
@@ -376,8 +355,7 @@ DEP_FILES := $(O_FILES:.o=.d) $(ULTRA_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(
 # Segment elf files
 SEG_FILES := $(SEGMENT_ELF_FILES) $(ACTOR_ELF_FILES) $(LEVEL_ELF_FILES)
 
-############################ Compiler Options ##################################
-
+##################### Compiler Options #######################
 INCLUDE_CFLAGS := -I include -I $(BUILD_DIR) -I $(BUILD_DIR)/include -I src -I .
 ENDIAN_BITWIDTH := $(BUILD_DIR)/endian-and-bitwidth
 include Makefile_dynos
@@ -417,6 +395,7 @@ ifeq ($(WINDOWS_BUILD),1) # fixes compilation in MXE on Linux and WSL
   OBJCOPY := objcopy
   OBJDUMP := $(CROSS)objdump
 else ifeq ($(OSX_BUILD),1)
+  CPP := cpp-9 -P
   OBJDUMP := i686-w64-mingw32-objdump
   OBJCOPY := i686-w64-mingw32-objcopy
 else # Linux & other builds
@@ -450,7 +429,7 @@ else ifeq ($(WINDOW_API),SDL2)
   else ifeq ($(TARGET_RPI),1)
     BACKEND_LDFLAGS += -lGLESv2
   else ifeq ($(OSX_BUILD),1)
-    BACKEND_LDFLAGS += -framework OpenGL $(shell pkg-config --libs glew)
+    BACKEND_LDFLAGS += -framework OpenGL `pkg-config --libs glew`
   else
     BACKEND_LDFLAGS += -lGL
   endif
@@ -467,11 +446,11 @@ endif
 
 # SDL can be used by different systems, so we consolidate all of that shit into this
 ifeq ($(SDL_USED),2)
-  BACKEND_CFLAGS += -DHAVE_SDL2=1 $(shell $(SDLCONFIG) --cflags)
+  BACKEND_CFLAGS += -DHAVE_SDL2=1 `$(SDLCONFIG) --cflags`
   ifeq ($(WINDOWS_BUILD),1)
-    BACKEND_LDFLAGS += $(shell $(SDLCONFIG) --static-libs) -lsetupapi -luser32 -limm32 -lole32 -loleaut32 -lshell32 -lwinmm -lversion
+    BACKEND_LDFLAGS += `$(SDLCONFIG) --static-libs` -lsetupapi -luser32 -limm32 -lole32 -loleaut32 -lshell32 -lwinmm -lversion
   else
-    BACKEND_LDFLAGS += $(shell $(SDLCONFIG) --libs)
+    BACKEND_LDFLAGS += `$(SDLCONFIG) --libs`
   endif
 endif
 
@@ -485,8 +464,8 @@ else ifeq ($(TARGET_WEB),1)
 
 # Linux / Other builds below
 else
-  CC_CHECK := $(CC) -fsyntax-only -fsigned-char $(BACKEND_CFLAGS) $(PLATFORM_CFLAGS) $(INCLUDE_CFLAGS) -Wall -Wextra -Wno-format-security $(VERSION_CFLAGS) $(GRUCODE_CFLAGS)
-  CFLAGS := $(OPT_FLAGS) $(PLATFORM_CFLAGS) $(INCLUDE_CFLAGS) $(BACKEND_CFLAGS) $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -fno-strict-aliasing -fwrapv
+  CC_CHECK := $(CC) -fsyntax-only -fsigned-char $(BACKEND_CFLAGS) $(INCLUDE_CFLAGS) -Wall -Wextra -Wno-format-security $(VERSION_CFLAGS) $(GRUCODE_CFLAGS)
+  CFLAGS := $(OPT_FLAGS) $(INCLUDE_CFLAGS) $(BACKEND_CFLAGS) $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -fno-strict-aliasing -fwrapv
 
 endif
 
@@ -503,6 +482,12 @@ endif
 ifeq ($(NODRAWINGDISTANCE),1)
   CC_CHECK += -DNODRAWINGDISTANCE
   CFLAGS += -DNODRAWINGDISTANCE
+endif
+
+# Check for 60 fps option
+ifeq ($(MODELPACK),1)
+  CC_CHECK += -DMODELPACK
+  CFLAGS += -DMODELPACK
 endif
 
 # Check for 60 fps option
@@ -547,6 +532,8 @@ ifeq ($(LEGACY_GL),1)
   CFLAGS += -DLEGACY_GL
 endif
 
+# TODO: Remove -DEXTERNAL_DATA
+
 # Load external textures
 CC_CHECK += -DFS_BASEDIR="\"$(BASEDIR)\""
 CFLAGS += -DFS_BASEDIR="\"$(BASEDIR)\""
@@ -571,7 +558,7 @@ else ifeq ($(TARGET_RPI),1)
   LDFLAGS := $(OPT_FLAGS) -lm $(BACKEND_LDFLAGS) -no-pie
 
 else ifeq ($(OSX_BUILD),1)
-  LDFLAGS := -lm $(PLATFORM_LDFLAGS) $(BACKEND_LDFLAGS) -lpthread
+  LDFLAGS := -lm $(BACKEND_LDFLAGS) -no-pie -lpthread
 
 else
   LDFLAGS := $(BITS) -march=$(TARGET_ARCH) -lm $(BACKEND_LDFLAGS) -no-pie -lpthread
@@ -584,7 +571,8 @@ endif # End of LDFLAGS
 # Prevent a crash with -sopt
 export LANG := C
 
-################################# Other Tools ##################################
+####################### Other Tools #########################
+
 # N64 conversion tools
 TOOLS_DIR = tools
 AIFF_EXTRACT_CODEBOOK = $(TOOLS_DIR)/aiff_extract_codebook
@@ -592,13 +580,20 @@ VADPCM_ENC = $(TOOLS_DIR)/vadpcm_enc
 EXTRACT_DATA_FOR_MIO = $(TOOLS_DIR)/extract_data_for_mio
 ZEROTERM = $(PYTHON) $(TOOLS_DIR)/zeroterm.py
 
-############################### Dependency Check ###############################
+###################### Dependency Check #####################
 
 # Stubbed
 
-#################################### Targets ###################################
+######################## Targets #############################
 
 all: $(EXE)
+
+# thank you apple very cool
+ifeq ($(HOST_OS),Darwin)
+  CP := gcp
+else
+  CP := cp
+endif
 
 BASEPACK_PATH := $(BUILD_DIR)/$(BASEDIR)/
 BASEPACK_LST := $(BUILD_DIR)/basepack.lst
@@ -612,7 +607,7 @@ res: $(BASEPACK_PATH)
 # prepares the basepack.lst
 $(BASEPACK_LST): $(EXE)
 	@mkdir -p $(BUILD_DIR)/$(BASEDIR)
-	@touch $(BASEPACK_LST)
+	@echo -n > $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/bank_sets sound/bank_sets" >> $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/sequences.bin sound/sequences.bin" >> $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/sound_data.ctl sound/sound_data.ctl" >> $(BASEPACK_LST)
@@ -622,13 +617,10 @@ $(BASEPACK_LST): $(EXE)
 	@find levels -name \*.png -exec echo "{} gfx/{}" >> $(BASEPACK_LST) \;
 	@find textures -name \*.png -exec echo "{} gfx/{}" >> $(BASEPACK_LST) \;
 	@find texts -name \*.json -exec echo "{} {}" >> $(BASEPACK_LST) \;
-	@find db -name \*.* -exec echo "{} {}" >> $(BASEPACK_LST) \;
 
-ifneq ($(NO_COPY),1)
 # prepares the resource ZIP with base data
 $(BASEPACK_PATH): $(BASEPACK_LST)
 	@$(PYTHON) $(TOOLS_DIR)/mkzip.py $(BASEPACK_LST) $(BASEPACK_PATH) $(LEGACY_RES)
-endif
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
@@ -704,6 +696,9 @@ $(BUILD_DIR)/include/level_headers.h: levels/level_headers.h.in
 
 $(BUILD_DIR)/assets/mario_anim_data.c: $(wildcard assets/anims/*.inc.c)
 	$(PYTHON) tools/mario_anims_converter.py > $@
+
+$(BUILD_DIR)/assets/luigi_anim_data.c: $(wildcard assets/luigi_anims/*.inc.c)
+	$(PYTHON) tools/luigi_anims_converter.py > $@
 
 $(BUILD_DIR)/assets/demo_data.c: assets/demo_data.json $(wildcard assets/demos/*.bin)
 	$(PYTHON) tools/demo_data_converter.py assets/demo_data.json $(VERSION_CFLAGS) > $@

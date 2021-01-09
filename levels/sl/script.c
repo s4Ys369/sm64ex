@@ -33,6 +33,12 @@ static const LevelScript script_func_local_3[] = {
     OBJECT(/*model*/ MODEL_NONE,               /*pos*/  700, 3428,   700, /*angle*/ 0,  30, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSLSnowmanWind),
     OBJECT(/*model*/ MODEL_NONE,               /*pos*/  480, 2300,  1370, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvIgloo),
     OBJECT(/*model*/ MODEL_BIG_CHILL_BULLY,    /*pos*/  315, 1331, -4852, /*angle*/ 0,   0, 0, /*behParam*/ 0x01000000, /*beh*/ bhvBigChillBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  5245,  1024,   5259, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  -117,  1024,   -6453, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  5630,  1024,   -2555, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  -202,  922,   -2539, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  -1836,  1223,   -4785, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
+    OBJECT(/*model*/ MODEL_CHILL_BULLY,      /*pos*/  1803,  1024,   -4471, /*angle*/ 0,   0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvSmallBully),
     OBJECT(/*model*/ MODEL_MR_BLIZZARD_HIDDEN, /*pos*/ 2954,  970,   750, /*angle*/ 0,   0, 0, /*behParam*/ 0x00020000, /*beh*/ bhvMrBlizzard),
     RETURN(),
 };

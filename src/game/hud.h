@@ -21,6 +21,8 @@ enum CameraHUDLut {
     GLYPH_CAM_ARROW_DOWN
 };
 
+void set_notification_state(s8 newState);
+s8 get_notification_state();
 // Functions
 void set_hud_camera_status(s16 status);
 void render_hud(void);

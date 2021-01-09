@@ -308,6 +308,22 @@ struct MarioAnimation
     u8 padding[4];
 };
 
+struct LuigiAnimDmaRelatedThing
+{
+    u32 count;
+    u8 *srcAddr;
+    struct OffsetSizePair anim[1]; // dynamic size
+};
+
+struct LuigiAnimation
+{
+    struct LuigiAnimDmaRelatedThing *animDmaTable;
+    u8 *currentAnimAddr;
+    struct Animation *targetAnim;
+    u8 padding[4];
+};
+
+
 struct MarioState
 {
     /*0x00*/ u16 unk00;

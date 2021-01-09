@@ -426,14 +426,14 @@ static void level_cmd_23(void) {
 
 static void level_cmd_init_mario(void) {
     vec3s_set(gMarioSpawnInfo->startPos, 0, 0, 0);
-    vec3s_set(gMarioSpawnInfo->startAngle, 0, 0, 0);
+    vec3s_set(gMarioSpawnInfo->startAngle, 0, 0, 0);    
 
     gMarioSpawnInfo->activeAreaIndex = -1;
     gMarioSpawnInfo->areaIndex = 0;
     gMarioSpawnInfo->behaviorArg = CMD_GET(u32, 4);
     gMarioSpawnInfo->behaviorScript = CMD_GET(void *, 8);
-    gMarioSpawnInfo->unk18 = gLoadedGraphNodes[CMD_GET(u8, 3)];
-    gMarioSpawnInfo->next = NULL;
+    gMarioSpawnInfo->unk18 = gLoadedGraphNodes[MODEL_PLAYER];
+    gMarioSpawnInfo->next = NULL;    
 
     sCurrentCmd = CMD_NEXT;
 }

@@ -2697,8 +2697,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 #define TXT_SAVEOPTIONS_X x + 12
 #define TXT_SAVECONT_Y 0
 #define TXT_SAVEQUIT_Y 20
-#define TXT_SAVE_EXIT_GAME_Y 40
-#define TXT_CONTNOSAVE_Y 60
+#define TXT_CONTNOSAVE_Y 40
+#define TXT_SAVE_EXIT_GAME_Y 60
 
 #define X_VAL9 x
 
@@ -2710,8 +2710,8 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e) {
 
     print_generic_string(TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y, get_key_string("TEXT_SAVE_AND_CONTINUE"));
     print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y, get_key_string("TEXT_SAVE_AND_QUIT"));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVE_EXIT_GAME_Y, get_key_string("TEXT_SAVE_EXIT_GAME"));
     print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, get_key_string("TEXT_CONTINUE_WITHOUT_SAVING"));
+    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVE_EXIT_GAME_Y, get_key_string("TEXT_SAVE_EXIT_GAME"));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 
