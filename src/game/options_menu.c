@@ -1,5 +1,5 @@
 #ifdef EXT_OPTIONS_MENU
-
+#ifdef DYNOS_INL
 #include "sm64.h"
 #include "engine/math_util.h"
 #include "audio/external.h"
@@ -652,5 +652,5 @@ void optmenu_check_buttons(void) {
         optmenu_option_timer = 0;
     }
 }
-
+#endif
 #endif // EXT_OPTIONS_MENU
