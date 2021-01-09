@@ -25,6 +25,9 @@ TARGET_RPI ?= 0
 # Build for Emscripten/WebGL
 TARGET_WEB ?= 0
 
+# Build for Nintendo Switch
+TARGET_SWITCH ?= 0
+
 # Makeflag to enable OSX fixes
 OSX_BUILD ?= 0
 
@@ -81,7 +84,7 @@ else
   endif
 endif
 
-ifeq ($(TARGET_WEB),0)
+ifeq ($(TARGET_WEB)$(TARGET_RPI)$(TARGET_SWITCH),000)
   ifeq ($(HOST_OS),Windows)
     WINDOWS_BUILD := 1
   endif
@@ -115,6 +118,7 @@ VERSION_ASFLAGS := --defsym $(VERSION_DEF)=1
 # Stuff for showing the git hash in the intro
 # From https://stackoverflow.com/questions/44038428/include-git-commit-hash-and-or-branch-name-in-c-c-source
 GIT_HASH=`git rev-parse --short HEAD`
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMPILE_TIME=`date -u +'%Y-%m-%d %H:%M:%S UTC'`
 VERSION_CFLAGS += -DGIT_HASH="\"$(GIT_HASH)\"" -DCOMPILE_TIME="\"$(COMPILE_TIME)\""
 
@@ -135,6 +139,9 @@ ifeq ($(TARGET_RPI),1) # Define RPi to change SDL2 title & GLES2 hints
       VERSION_CFLAGS += -DUSE_GLES
 endif
 
+ifeq ($(TARGET_SWITCH),1)
+      VERSION_CFLAGS += -DUSE_GLES -DTARGET_SWITCH
+endif
 ifeq ($(OSX_BUILD),1) # Modify GFX & SDL2 for OSX GL
      VERSION_CFLAGS += -DOSX_BUILD
 endif
@@ -195,6 +202,8 @@ BUILD_DIR_BASE := build
 
 ifeq ($(TARGET_WEB),1)
   BUILD_DIR := $(BUILD_DIR_BASE)/$(VERSION)_web
+else ifeq ($(TARGET_SWITCH),1)
+  BUILD_DIR := $(BUILD_DIR_BASE)/$(VERSION)_nx
 else
   BUILD_DIR := $(BUILD_DIR_BASE)/$(VERSION)_pc
 endif
@@ -227,9 +236,12 @@ LEVEL_DIRS := $(patsubst levels/%,%,$(dir $(wildcard levels/*/header.h)))
 # Directories containing source files
 
 # Hi, I'm a PC
-SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers actors levels bin data assets src/text src/text/libs src/pc src/pc/gfx src/pc/audio src/pc/controller src/pc/fs src/pc/fs/packtypes src/sgi src/sgi/utils
+SRC_DIRS := src src/engine src/game src/audio src/menu src/buffers actors levels bin data assets src/text src/text/libs src/pc src/pc/gfx src/pc/audio src/pc/controller src/pc/fs src/pc/fs/packtypes src/sgi src/sgi/utils src/nx
 
 ifeq ($(DISCORDRPC),1)
+  ifneq ($(TARGET_SWITCH)$(TARGET_WEB)$(TARGET_RPI),000)
+    $(error Discord RPC does not work on this target)
+  endif
   SRC_DIRS += src/pc/discord
 endif
 
@@ -362,6 +374,30 @@ include Makefile_dynos
 
 # Huge deleted N64 section was here
 
+ifeq ($(TARGET_SWITCH),1)
+  ifeq ($(strip $(DEVKITPRO)),)
+    $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
+  endif
+  export PATH := $(DEVKITPRO)/devkitA64/bin:$(PATH)
+  PORTLIBS ?= $(DEVKITPRO)/portlibs/switch
+  LIBNX ?= $(DEVKITPRO)/libnx
+  CROSS ?= aarch64-none-elf-
+  SDLCROSS :=
+  CC := $(CROSS)gcc
+  CXX := $(CROSS)g++
+  STRIP := $(CROSS)strip
+  NXARCH := -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
+  APP_TITLE := Render96ex
+  APP_AUTHOR := Nintendo, n64decomp team, Render96 team
+  APP_VERSION := $(GIT_BRANCH) - $(GIT_HASH)
+  APP_ICON := $(CURDIR)/textures/logo/r96-logo.jpg
+  INCLUDE_CFLAGS += -isystem$(LIBNX)/include -I$(PORTLIBS)/include
+  OPT_FLAGS := -O2
+endif
+
+# for some reason sdl-config in dka64 is not prefixed, while pkg-config is
+SDLCROSS ?= $(CROSS)
+
 AS := $(CROSS)as
 
 ifeq ($(OSX_BUILD),1)
@@ -405,7 +441,7 @@ else # Linux & other builds
 endif
 
 PYTHON := python3
-SDLCONFIG := $(CROSS)sdl2-config
+SDLCONFIG := $(SDLCROSS)sdl2-config
 
 # configure backend flags
 
@@ -426,7 +462,7 @@ ifeq ($(WINDOW_API),DXGI)
 else ifeq ($(WINDOW_API),SDL2)
   ifeq ($(WINDOWS_BUILD),1)
     BACKEND_LDFLAGS += -lglew32 -lglu32 -lopengl32
-  else ifeq ($(TARGET_RPI),1)
+  else ifneq ($(TARGET_RPI)$(TARGET_SWITCH),00)
     BACKEND_LDFLAGS += -lGLESv2
   else ifeq ($(OSX_BUILD),1)
     BACKEND_LDFLAGS += -framework OpenGL `pkg-config --libs glew`
@@ -462,6 +498,10 @@ else ifeq ($(TARGET_WEB),1)
   CC_CHECK := $(CC) -fsyntax-only -fsigned-char $(BACKEND_CFLAGS) $(INCLUDE_CFLAGS) -Wall -Wextra -Wno-format-security $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -s USE_SDL=2
   CFLAGS := $(OPT_FLAGS) $(INCLUDE_CFLAGS) $(BACKEND_CFLAGS) $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -fno-strict-aliasing -fwrapv -s USE_SDL=2
 
+else ifeq ($(TARGET_SWITCH),1)
+  CC_CHECK := $(CC) $(NXARCH) -fsyntax-only -fsigned-char $(BACKEND_CFLAGS) $(INCLUDE_CFLAGS) -Wall -Wextra -Wno-format-security $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -D__SWITCH__=1
+  CFLAGS := $(NXARCH) $(OPT_FLAGS) $(INCLUDE_CFLAGS) $(BACKEND_CFLAGS) $(VERSION_CFLAGS) $(GRUCODE_CFLAGS) -fno-strict-aliasing -ftls-model=local-exec -fPIC -fwrapv -D__SWITCH__=1
+  
 # Linux / Other builds below
 else
   CC_CHECK := $(CC) -fsyntax-only -fsigned-char $(BACKEND_CFLAGS) $(INCLUDE_CFLAGS) -Wall -Wextra -Wno-format-security $(VERSION_CFLAGS) $(GRUCODE_CFLAGS)
@@ -559,6 +599,9 @@ else ifeq ($(TARGET_RPI),1)
 
 else ifeq ($(OSX_BUILD),1)
   LDFLAGS := -lm $(BACKEND_LDFLAGS) -no-pie -lpthread
+  
+else ifeq ($(TARGET_SWITCH),1)
+  LDFLAGS := -specs=$(LIBNX)/switch.specs $(NXARCH) $(OPT_FLAGS) -no-pie -L$(LIBNX)/lib $(BACKEND_LDFLAGS) -lstdc++ -lnx -lm
 
 else
   LDFLAGS := $(BITS) -march=$(TARGET_ARCH) -lm $(BACKEND_LDFLAGS) -no-pie -lpthread
@@ -587,6 +630,9 @@ ZEROTERM = $(PYTHON) $(TOOLS_DIR)/zeroterm.py
 ######################## Targets #############################
 
 all: $(EXE)
+ifeq ($(TARGET_SWITCH),1)
+all: $(EXE).nro
+endif
 
 # thank you apple very cool
 ifeq ($(HOST_OS),Darwin)
@@ -749,6 +795,25 @@ $(BUILD_DIR)/%.o: %.s
 
 $(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(BUILD_DIR)/$(RPC_LIBS)
 	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS)
+
+ifeq ($(TARGET_SWITCH), 1)
+
+# add `--icon=$(APP_ICON)` to this when we get a suitable icon
+%.nro: %.stripped %.nacp
+	@elf2nro $< $@ --nacp=$*.nacp --icon=$(APP_ICON)
+	@echo built ... $(notdir $@)
+	@echo $(APP_ICON)
+
+%.nacp:
+	@nacptool --create "$(APP_TITLE)" "$(APP_AUTHOR)" "$(APP_VERSION)" $@ $(NACPFLAGS)
+	@echo built ... $(notdir $@)
+
+%.stripped: %
+	@$(STRIP) -o $@ $<
+	@echo stripped ... $(notdir $<)
+
+endif
+
 
 .PHONY: all clean distclean default diff libultra res
 .PRECIOUS: $(BUILD_DIR)/bin/%.elf $(SOUND_BIN_DIR)/%.ctl $(SOUND_BIN_DIR)/%.tbl $(SOUND_SAMPLE_TABLES) $(SOUND_BIN_DIR)/%.s $(BUILD_DIR)/%
