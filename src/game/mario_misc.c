@@ -1,6 +1,7 @@
 #include <PR/ultratypes.h>
 
 #include "sm64.h"
+#include "pc/cheats.h"
 #include "area.h"
 #include "audio/external.h"
 #include "behavior_actions.h"
@@ -233,7 +234,11 @@ void bhv_unlock_door_star_init(void) {
     gCurrentObject->oUnlockDoorStarTimer = 0;
     gCurrentObject->oUnlockDoorStarYawVel = 0x1000;
     gCurrentObject->oPosX += 30.0f * sins(gMarioState->faceAngle[1] - 0x4000);
-    gCurrentObject->oPosY += 160.0f;
+    if (Cheats.EnableCheats && Cheats.PAC > 0) {
+        gCurrentObject->oPosY += 120.0f;
+    } else {
+        gCurrentObject->oPosY += 160.0f;
+    }
     gCurrentObject->oPosZ += 30.0f * coss(gMarioState->faceAngle[1] - 0x4000);
     gCurrentObject->oMoveAngleYaw = 0x7800;
     obj_scale(gCurrentObject, 0.5f);

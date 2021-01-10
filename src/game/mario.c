@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 
+#include "mario_cheats.h"
 #include "sm64.h"
 #include "area.h"
 #include "audio/data.h"
@@ -893,7 +894,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.
-            if ((m->forwardVel *= 1.5f) > 48.0f) {
+            if ((m->forwardVel *= 1.5f) > 48.0f && !(Cheats.EnableCheats && Cheats.FLJ)) {
                 m->forwardVel = 48.0f;
             }
             break;
@@ -1080,6 +1081,8 @@ s32 set_jump_from_landing(struct MarioState *m) {
                         set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
                     } else if (m->forwardVel > 20.0f) {
                         set_mario_action(m, ACT_TRIPLE_JUMP, 0);
+                    } else if (Cheats.EnableCheats && JUMP_MAN == 1) {
+                        set_mario_action(m, ACT_TRIPLE_JUMP, 0);
                     } else {
                         set_mario_action(m, ACT_JUMP, 0);
                     }
@@ -1243,6 +1246,10 @@ void squish_mario_model(struct MarioState *m) {
                 }
                 else if (Cheats.TinyMario) {
                     vec3f_set(m->marioObj->header.gfx.scale, 0.2f, 0.2f, 0.2f);
+                } else if (Cheats.PAC == 3) {
+                    vec3f_set(m->marioObj->header.gfx.scale, 1.5f, 1.5f, 1.5f);
+                } else if (Cheats.PAC == 5) {
+                    vec3f_set(m->marioObj->header.gfx.scale, 1.5f, 1.5f, 1.5f);
                 }
                 else {
                     vec3f_set(m->marioObj->header.gfx.scale, 1.0f, 1.0f, 1.0f);
@@ -1433,7 +1440,9 @@ void update_mario_inputs(struct MarioState *m) {
     update_mario_geometry_inputs(m);
 
     debug_print_speed_action_normal(m);
-    
+
+    cheats_mario_inputs(m);
+
     /* Moonjump cheat */
     while (Cheats.MoonJump == true && Cheats.EnableCheats == true && m->controller->buttonDown & L_TRIG ){
         m->vel[1] = 25;
@@ -1708,6 +1717,8 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     // Short hitbox for crouching/crawling/etc.
     if (m->action & ACT_FLAG_SHORT_HITBOX) {
         m->marioObj->hitboxHeight = 100.0f;
+    } else if (Cheats.EnableCheats && Cheats.PAC > 0) {
+        m->marioObj->hitboxHeight = 120.0f;
     } else {
         m->marioObj->hitboxHeight = 160.0f;
     }

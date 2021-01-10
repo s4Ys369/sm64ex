@@ -1,5 +1,7 @@
 #include <PR/ultratypes.h>
 
+#include "mario_cheats.h"
+#include "pc/cheats.h"
 #include "sm64.h"
 #include "area.h"
 #include "audio/data.h"
@@ -333,8 +335,15 @@ void update_flying(struct MarioState *m) {
     update_flying_pitch(m);
     update_flying_yaw(m);
 
-    m->forwardVel -= 2.0f * ((f32) m->faceAngle[0] / 0x4000) + 0.1f;
+    /*Flyer Cheat*/
+    if (Cheats.Fly) {
+        if (m->forwardVel < 30.0f) {
+            m->forwardVel += 2.0f;
+        }
+    }
     m->forwardVel -= 0.5f * (1.0f - coss(m->angleVel[1]));
+    m->forwardVel -= 2.0f * ((f32) m->faceAngle[0] / 0x4000) + 0.1f;
+
 
     if (m->forwardVel < 0.0f) {
         m->forwardVel = 0.0f;
@@ -373,6 +382,8 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
     stepResult = perform_air_step(m, stepArg);
     switch (stepResult) {
         case AIR_STEP_NONE:
+            // BLJ anywhere cheat
+            cheats_air_step(m);
             set_mario_animation(m, animation);
             break;
 
@@ -951,7 +962,13 @@ s32 act_ground_pound(struct MarioState *m) {
     if (m->actionState == 0) {
         if (m->actionTimer < 10) {
             yOffset = 20 - 2 * m->actionTimer;
-            if (m->pos[1] + yOffset + 160.0f < m->ceilHeight) {
+            if (Cheats.EnableCheats && Cheats.PAC > 0) {
+                if (m->pos[1] + yOffset + 120.0f < m->ceilHeight) {
+                    m->pos[1] += yOffset;
+                    m->peakHeight = m->pos[1];
+                    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
+                }
+            } else if (m->pos[1] + yOffset + 160.0f < m->ceilHeight) {
                 m->pos[1] += yOffset;
                 m->peakHeight = m->pos[1];
                 vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
@@ -1124,6 +1141,8 @@ u32 common_air_knockback_step(struct MarioState *m, u32 landAction, u32 hardFall
     stepResult = perform_air_step(m, 0);
     switch (stepResult) {
         case AIR_STEP_NONE:
+            // BLJ anywhere cheat
+            cheats_air_step(m);
             set_mario_animation(m, animation);
             break;
 

@@ -5,6 +5,7 @@
 #include "game/level_update.h"
 #include "game/mario.h"
 #include "game/object_list_processor.h"
+#include "pc/cheats.h"
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "math_util.h"
@@ -15,6 +16,23 @@
 /**************************************************
  *                      WALLS                     *
  **************************************************/
+
+#define DEATH_PLANE_HEIGHT -0x2000
+
+static struct Surface sDeathPlane = {
+    .type = SURFACE_DEATH_PLANE,
+    .force = 0,
+    .flags = 0,
+    .room = 0,
+    .lowerY = DEATH_PLANE_HEIGHT - 5,
+    .upperY = DEATH_PLANE_HEIGHT + 5,
+    .vertex1 = { 0, DEATH_PLANE_HEIGHT, 0 },
+    .vertex2 = { LEVEL_BOUNDARY_MAX * 2, DEATH_PLANE_HEIGHT, 0 },
+    .vertex3 = { 0, DEATH_PLANE_HEIGHT, LEVEL_BOUNDARY_MAX * 2 },
+    .normal = { 0.0f, 1.0f, 0.0f },
+    .originOffset = 0,
+    .object = NULL,
+};
 
 /**
  * Iterate through the list of walls until all walls are checked and
@@ -42,6 +60,11 @@ static s32 find_wall_collisions_from_list(struct SurfaceNode *surfaceNode,
     while (surfaceNode != NULL) {
         surf = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
+
+        /*No Clip Cheats*/
+        if (Cheats.EnableCheats && Cheats.NoBounds) {
+            continue;
+        }
 
         // Exclude a large number of walls immediately to optimize.
         if (y < surf->lowerY || y > surf->upperY) {
@@ -173,7 +196,12 @@ s32 f32_find_wall_collision(f32 *xPtr, f32 *yPtr, f32 *zPtr, f32 offsetY, f32 ra
 
     collision.numWalls = 0;
 
-    numCollisions = find_wall_collisions(&collision);
+    /*No Clip Cheats*/
+    if (Cheats.EnableCheats && Cheats.NoBounds) {
+        numCollisions = 0;
+    } else {
+        numCollisions = find_wall_collisions(&collision);
+    }
 
     *xPtr = collision.x;
     *yPtr = collision.y;
@@ -193,6 +221,10 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     s16 z = colData->z;
 
     colData->numWalls = 0;
+
+    if (Cheats.EnableCheats && Cheats.NoBounds) {
+        return numCollisions;
+    }
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
         return numCollisions;
@@ -238,6 +270,10 @@ static struct Surface *find_ceil_from_list(struct SurfaceNode *surfaceNode, s32 
     while (surfaceNode != NULL) {
         surf = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
+
+        if (Cheats.EnableCheats && Cheats.NoBounds) {
+            continue;
+        }
 
         x1 = surf->vertex1[0];
         z1 = surf->vertex1[2];
@@ -322,6 +358,10 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     y = (s16) posY;
     z = (s16) posZ;
     *pceil = NULL;
+
+    if (Cheats.EnableCheats && Cheats.NoBounds) {
+        return height;
+    }
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
         return height;
@@ -421,6 +461,10 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 #endif
 
     // Iterate through the list of floors until there are no more floors.
+    if (Cheats.EnableCheats && Cheats.NoBounds) {
+        floor = &sDeathPlane;
+        *pheight = DEATH_PLANE_HEIGHT;
+    }
     while (surfaceNode != NULL) {
         surf = surfaceNode->surface;
         surfaceNode = surfaceNode->next;
@@ -451,6 +495,9 @@ static struct Surface *find_floor_from_list(struct SurfaceNode *surfaceNode, s32
 #endif
 
         // Check that the point is within the triangle bounds.
+        if (Cheats.EnableCheats && Cheats.NoBounds) {
+            continue;
+        }
         if ((z1 - z) * (x2 - x1) - (x1 - x) * (z2 - z1) < 0) {
             continue;
         }

@@ -14,6 +14,7 @@
 #endif
 #include "game/mario_misc.h"
 #include "game/game_init.h"
+#include "game/cheats_menu.h"
 #include "game/ingame_menu.h"
 #include "game/options_menu.h"
 #include "pc/pc_main.h"
@@ -227,6 +228,33 @@ static void optvideo_apply(UNUSED struct Option *self, s32 arg) {
     if (!arg) configWindow.settings_changed = true;
 }
 
+
+static void setCap_Wing(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.WingCap = true;
+}
+static void setCap_Metal(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.MetalCap = true;
+}
+static void setCap_Vanish(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.VanishCap = true;
+}
+static void setCap_Remove(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.RemoveCap = true;
+}
+static void setCap_Normal(UNUSED struct Option *self, s32 arg) {
+    Cheats.WingCap = false;
+    Cheats.MetalCap = false;
+    Cheats.VanishCap = false;
+    Cheats.RemoveCap = false;
+    if (!arg) Cheats.NormalCap = true;
+}
+static void setJBC(UNUSED struct Option *self, s32 arg) {
+    if (!arg)
+        Cheats.JBC = true;
+}
+
+
+
 /* submenu option lists */
 
 #ifdef BETTERCAMERA
@@ -294,15 +322,45 @@ static struct Option optsAudio[] = {
 };
 
 static struct Option optsCheats[] = {
-    DEF_OPT_TOGGLE( optsCheatsStr[0], &Cheats.EnableCheats ),
-    DEF_OPT_TOGGLE( optsCheatsStr[1], &Cheats.MoonJump ),
-    DEF_OPT_TOGGLE( optsCheatsStr[2], &Cheats.GodMode ),
-    DEF_OPT_TOGGLE( optsCheatsStr[3], &Cheats.InfiniteLives ),
-    DEF_OPT_TOGGLE( optsCheatsStr[4], &Cheats.SuperSpeed ),
-    DEF_OPT_TOGGLE( optsCheatsStr[5], &Cheats.Responsive ),
-    DEF_OPT_TOGGLE( optsCheatsStr[6], &Cheats.ExitAnywhere ),
-    DEF_OPT_TOGGLE( optsCheatsStr[7], &Cheats.HugeMario ),
-    DEF_OPT_TOGGLE( optsCheatsStr[8], &Cheats.TinyMario ),
+    DEF_OPT_TOGGLE(optsCheatsStr[0], &Cheats.EnableCheats),
+    DEF_OPT_TOGGLE(optsCheatsStr[1], &Cheats.MoonJump),
+    DEF_OPT_TOGGLE(optsCheatsStr[2], &Cheats.GodMode),
+    DEF_OPT_TOGGLE(optsCheatsStr[3], &Cheats.InfiniteLives),
+    DEF_OPT_TOGGLE(optsCheatsStr[4], &Cheats.SuperSpeed),
+    DEF_OPT_TOGGLE(optsCheatsStr[5], &Cheats.Responsive),
+    DEF_OPT_TOGGLE(optsCheatsStr[6], &Cheats.ExitAnywhere),
+    DEF_OPT_TOGGLE(optsCheatsStr[7], &Cheats.HugeMario),
+    DEF_OPT_TOGGLE(optsCheatsStr[8], &Cheats.TinyMario),
+    DEF_OPT_CHOICE(optsCheatsStr2[0], &Cheats.Coin, CoinChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[1], &Cheats.Hover),
+    DEF_OPT_TOGGLE(optsCheatsStr2[2], &Cheats.Moon),
+    DEF_OPT_CHOICE(optsCheatsStr2[3], &Cheats.Run, SpeedChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[4], &Cheats.NDB),
+    DEF_OPT_TOGGLE(optsCheatsStr2[5], &Cheats.Jump),
+    DEF_OPT_TOGGLE(optsCheatsStr2[6], &Cheats.SPD),
+    DEF_OPT_TOGGLE(optsCheatsStr2[7], &Cheats.TPF),
+    DEF_OPT_CHOICE(optsCheatsStr2[8], &Cheats.JB, SeqChoices),
+    DEF_OPT_BUTTON(optsCheatsStr2[9], setJBC),
+    DEF_OPT_TOGGLE(optsCheatsStr2[10], &Cheats.QuikEnd),
+    DEF_OPT_CHOICE(optsCheatsStr2[11], &Cheats.Hurt, HurtCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[12], &Cheats.Cann),
+    DEF_OPT_TOGGLE(optsCheatsStr2[13], &Cheats.AutoWK),
+    DEF_OPT_TOGGLE(optsCheatsStr2[14], &Cheats.GetShell),
+    DEF_OPT_TOGGLE(optsCheatsStr2[15], &Cheats.GetBob),
+    DEF_OPT_CHOICE(optsCheatsStr2[16], &Cheats.Spamba, SpamCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[17], &Cheats.Swim),
+    DEF_OPT_BUTTON(optsCheatsStr2[18], setCap_Wing),
+    DEF_OPT_BUTTON(optsCheatsStr2[19], setCap_Metal),
+    DEF_OPT_BUTTON(optsCheatsStr2[20], setCap_Vanish),
+    DEF_OPT_BUTTON(optsCheatsStr2[21], setCap_Remove),
+    DEF_OPT_BUTTON(optsCheatsStr2[22], setCap_Normal),
+    DEF_OPT_CHOICE(optsCheatsStr2[23], &Cheats.BLJAnywhere, bljCheatChoices),
+    DEF_OPT_CHOICE(optsCheatsStr2[24], &Cheats.PAC, PlayAsCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[25], &Cheats.Triple),
+    DEF_OPT_TOGGLE(optsCheatsStr2[26], &Cheats.Fly),
+    DEF_OPT_TOGGLE(optsCheatsStr2[27], &Cheats.NoBounds),
+    DEF_OPT_TOGGLE(optsCheatsStr2[28], &Cheats.FLJ),
+    DEF_OPT_TOGGLE(optsCheatsStr2[29], &Cheats.TimeStop),
 
 };
 

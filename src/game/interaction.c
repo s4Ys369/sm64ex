@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 
+#include "pc/cheats.h"
 #include "area.h"
 #include "actors/common1.h"
 #include "audio/external.h"
@@ -14,6 +15,7 @@
 #include "interaction.h"
 #include "level_update.h"
 #include "mario.h"
+#include "mario_cheats.h"
 #include "mario_step.h"
 #include "memory.h"
 #include "obj_behaviors.h"
@@ -1818,21 +1820,26 @@ void mario_process_interactions(struct MarioState *m) {
 }
 
 void check_death_barrier(struct MarioState *m) {
-    if (m->pos[1] < m->floorHeight + 2048.0f) {
-        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_UNKNOWN_18)) {
-            play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+    while (Cheats.NDB == false) {
+        if (m->pos[1] < m->floorHeight + 2048.0f) {
+            if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_UNKNOWN_18)) {
+                play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+            }
         }
+        break;
     }
 }
 
 void check_lava_boost(struct MarioState *m) {
-    if (!(m->action & ACT_FLAG_RIDING_SHELL) && m->pos[1] < m->floorHeight + 10.0f) {
-        if (!(m->flags & MARIO_METAL_CAP)) {
-            m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
-        }
+    if (!(Cheats.EnableCheats && HAZ_WALK == 1)) {
+        if (!(m->action & ACT_FLAG_RIDING_SHELL) && m->pos[1] < m->floorHeight + 10.0f) {
+            if (!(m->flags & MARIO_METAL_CAP)) {
+                m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+            }
 
-        update_mario_sound_and_camera(m);
-        drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0);
+            update_mario_sound_and_camera(m);
+            drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0);
+        }
     }
 }
 
@@ -1886,6 +1893,9 @@ void mario_handle_special_floors(struct MarioState *m) {
         if (!(m->action & ACT_FLAG_AIR) && !(m->action & ACT_FLAG_SWIMMING)) {
             switch (floorType) {
                 case SURFACE_BURNING:
+                    if (Cheats.EnableCheats && HAZ_WALK == 1) {
+                        break;
+                    }
                     check_lava_boost(m);
                     break;
             }
