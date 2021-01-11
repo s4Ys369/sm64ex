@@ -1,5 +1,7 @@
 #include <ultra64.h>
 
+#include "pc/cheats.h"
+#include "mario_cheats.h"
 #include "sm64.h"
 #include "engine/math_util.h"
 #include "engine/surface_collision.h"
@@ -105,6 +107,9 @@ void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
 }
 
 u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
+    if (Cheats.EnableCheats && HAZ_WALK == 1) {
+        m->quicksandDepth = 0.0f;
+    } else
     if (m->action & ACT_FLAG_RIDING_SHELL) {
         m->quicksandDepth = 0.0f;
     } else {

@@ -124,7 +124,7 @@ s32 osEepromProbe(UNUSED OSMesgQueue *mq) {
 }
 
 s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes) {
-    u8 content[512];
+    u8 content[0x1600];
     s32 ret = -1;
 
 #ifdef TARGET_WEB
@@ -162,7 +162,7 @@ s32 osEepromLongRead(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes)
 }
 
 s32 osEepromLongWrite(UNUSED OSMesgQueue *mq, u8 address, u8 *buffer, int nbytes) {
-    u8 content[512] = {0};
+    u8 content[0x1600] = {0};
     if (address != 0 || nbytes != 512) {
         osEepromLongRead(mq, 0, content, 512);
     }

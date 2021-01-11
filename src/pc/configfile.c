@@ -7,6 +7,7 @@
 #include <ctype.h>
 
 #include "platform.h"
+#include "cheats.h"
 #include "configfile.h"
 #include "cliopts.h"
 #include "gfx/gfx_screen_config.h"
@@ -51,6 +52,12 @@ ConfigWindow configWindow       = {
 };
 
 unsigned int configLanguage     = 0;
+#ifdef TARGET_SWITCH
+bool configSwitchHud = true;
+bool configPrecacheRes = false;
+#else
+bool configPrecacheRes = true;
+#endif
 
 unsigned int configFiltering    = 1;          // 0=force nearest, 1=linear, (TODO) 2=three-point
 unsigned int configMasterVolume = MAX_VOLUME; // 0 - MAX_VOLUME
@@ -75,7 +82,7 @@ unsigned int configKeyStickLeft[MAX_BINDS]  = { 0x001E,   VK_INVALID, VK_INVALID
 unsigned int configKeyStickRight[MAX_BINDS] = { 0x0020,   VK_INVALID, VK_INVALID };
 unsigned int configStickDeadzone = 16; // 16*DEADZONE_STEP=4960 (the original default deadzone)
 unsigned int configRumbleStrength = 50;
-bool configPrecacheRes = true;
+
 #ifdef BETTERCAMERA
 // BetterCamera settings
 unsigned int configCameraXSens   = 50;
@@ -125,6 +132,9 @@ static const struct ConfigOption options[] = {
     {.name = "rumble_strength",      .type = CONFIG_TYPE_UINT, .uintValue = &configRumbleStrength},
     {.name = "precache",             .type = CONFIG_TYPE_BOOL, .boolValue = &configPrecacheRes},
     {.name = "language",             .type = CONFIG_TYPE_UINT, .boolValue = &configLanguage},
+    #ifdef TARGET_SWITCH
+    {.name = "nx_hud",               .type = CONFIG_TYPE_BOOL, .boolValue = &configSwitchHud},
+    #endif
     #ifdef BETTERCAMERA
     {.name = "bettercam_enable",     .type = CONFIG_TYPE_BOOL, .boolValue = &configEnableCamera},
     {.name = "bettercam_analog",     .type = CONFIG_TYPE_BOOL, .boolValue = &configCameraAnalog},
@@ -138,6 +148,31 @@ static const struct ConfigOption options[] = {
     {.name = "bettercam_degrade",    .type = CONFIG_TYPE_UINT, .uintValue = &configCameraDegrade},
     #endif
     {.name = "skip_intro",           .type = CONFIG_TYPE_BOOL, .boolValue = &configSkipIntro},
+    {.name = "enable_cheats",        .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.EnableCheats },
+    {.name = "moonjump",             .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.MoonJump },
+    {.name = "invincible",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.GodMode },
+    {.name = "infintie_lives",       .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.InfiniteLives },
+    {.name = "super_speed",          .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.SuperSpeed },
+    {.name = "controls",             .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Responsive },
+    {.name = "exit_anywhere",        .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.ExitAnywhere },
+    {.name = "huge_mario",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.HugeMario },
+    {.name = "tiny_mario",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.TinyMario },
+    {.name = "coin",                 .type = CONFIG_TYPE_UINT, .uintValue = &Cheats.Coin },
+    {.name = "hover_mode",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Hover },
+    {.name = "moon_gravity",         .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Moon },
+    {.name = "run_speed",            .type = CONFIG_TYPE_UINT, .uintValue = &Cheats.Run },
+    {.name = "no_death_barrier",     .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.NDB },
+    {.name = "jumps_higher",         .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Jump },
+    {.name = "speed_display",        .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.SPD },
+    {.name = "t_pose_float",         .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.TPF },
+    {.name = "cannon_anywhere",      .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Cann },
+    {.name = "auto_wk",              .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.AutoWK },
+    {.name = "get_shell",            .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.GetShell },
+    {.name = "get_bobomb",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.GetBob },
+    {.name = "swift_swim",           .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Swim },
+    {.name = "blj_anywhere",         .type = CONFIG_TYPE_UINT, .uintValue = &Cheats.BLJAnywhere },
+    {.name = "play_as",              .type = CONFIG_TYPE_UINT, .uintValue = &Cheats.PAC },
+    {.name = "flyer",                .type = CONFIG_TYPE_BOOL, .boolValue = &Cheats.Fly },
     #ifdef DISCORDRPC
     {.name = "discordrpc_enable",    .type = CONFIG_TYPE_BOOL, .boolValue = &configDiscordRPC},
     #endif 

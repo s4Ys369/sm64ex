@@ -31,7 +31,7 @@
 /// Total number of dynamic `GdObj`s that can be created
 #define DYNOBJ_LIST_SIZE 3000
 /// Maximum number of verticies supported when adding vertices node to an `ObjShape`
-#define VTX_BUF_SIZE 3000
+#define VTX_BUF_SIZE 3249
 
 // types
 /// Information about a dynamically created `GdObj`

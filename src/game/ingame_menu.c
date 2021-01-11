@@ -29,6 +29,7 @@
 #include "options_menu.h"
 #endif
 
+#include "text/txtconv.h"
 #include "text/text-loader.h"
 
 u16 gDialogColorFadeTimer;
@@ -115,6 +116,50 @@ s8 gLastDialogResponse = 0;
 u8 gMenuHoldKeyIndex = 0;
 u8 gMenuHoldKeyTimer = 0;
 s32 gDialogResponse = 0;
+
+#ifdef HIGHFPS
+static Gfx *sInterpolatedDialogOffsetPos;
+static f32 sInterpolatedDialogOffset;
+static Gfx *sInterpolatedDialogRotationPos;
+static f32 sInterpolatedDialogScale;
+static f32 sInterpolatedDialogRotation;
+static Gfx *sInterpolatedDialogZoomPos;
+
+void patch_interpolated_dialog(void) {
+    Mtx *matrix;
+
+    if (sInterpolatedDialogOffsetPos != NULL) {
+        matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
+        guTranslate(matrix, 0, sInterpolatedDialogOffset, 0);
+        gSPMatrix(sInterpolatedDialogOffsetPos, VIRTUAL_TO_PHYSICAL(matrix),
+                  G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+        sInterpolatedDialogOffsetPos = NULL;
+    }
+    if (sInterpolatedDialogRotationPos != NULL) {
+        matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
+        guScale(matrix, 1.0 / sInterpolatedDialogScale, 1.0 / sInterpolatedDialogScale, 1.0f);
+        gSPMatrix(sInterpolatedDialogRotationPos++, VIRTUAL_TO_PHYSICAL(matrix),
+                  G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+        matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
+        guRotate(matrix, sInterpolatedDialogRotation * 4.0f, 0, 0, 1.0f);
+        gSPMatrix(sInterpolatedDialogRotationPos, VIRTUAL_TO_PHYSICAL(matrix),
+                  G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+        sInterpolatedDialogRotationPos = NULL;
+    }
+    if (sInterpolatedDialogZoomPos != NULL) {
+        matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
+        guTranslate(matrix, 65.0 - (65.0 / sInterpolatedDialogScale),
+                    (40.0 / sInterpolatedDialogScale) - 40, 0);
+        gSPMatrix(sInterpolatedDialogZoomPos++, VIRTUAL_TO_PHYSICAL(matrix),
+                  G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+        matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
+        guScale(matrix, 1.0 / sInterpolatedDialogScale, 1.0 / sInterpolatedDialogScale, 1.0f);
+        gSPMatrix(sInterpolatedDialogZoomPos, VIRTUAL_TO_PHYSICAL(matrix),
+                  G_MTX_MODELVIEW | G_MTX_MUL | G_MTX_NOPUSH);
+        sInterpolatedDialogZoomPos = NULL;
+    }
+}
+#endif
 
 void create_dl_identity_matrix(void) {
     Mtx *matrix = (Mtx *) alloc_display_list(sizeof(Mtx));
@@ -929,6 +974,52 @@ void reset_dialog_render_state(void) {
 #define Y_VAL2 5.0f
 #endif
 
+#ifdef HIGHFPS
+void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
+    UNUSED s32 unused;
+
+    create_dl_translation_matrix(MENU_MTX_NOPUSH, dialog->leftOffset, dialog->width, 0);
+
+    switch (gDialogBoxType) {
+        case DIALOG_TYPE_ROTATE: // Renders a dialog black box with zoom and rotation
+            if (gDialogBoxState == DIALOG_STATE_OPENING || gDialogBoxState == DIALOG_STATE_CLOSING) {
+                sInterpolatedDialogRotationPos = gDisplayListHead;
+                if (gDialogBoxState == DIALOG_STATE_OPENING) {
+                    sInterpolatedDialogScale = gDialogBoxScale - 2 / 2;
+                    sInterpolatedDialogRotation = gDialogBoxOpenTimer - 7.5f / 2;
+                } else {
+                    sInterpolatedDialogScale = gDialogBoxScale + 2 / 2;
+                    sInterpolatedDialogRotation = gDialogBoxOpenTimer + 7.5f / 2;
+                }
+                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / gDialogBoxScale, 1.0 / gDialogBoxScale, 1.0f);
+                // convert the speed into angle
+                create_dl_rotation_matrix(MENU_MTX_NOPUSH, gDialogBoxOpenTimer * 4.0f, 0, 0, 1.0f);
+            }
+            gDPSetEnvColor(gDisplayListHead++, 0, 0, 0, 150);
+            break;
+        case DIALOG_TYPE_ZOOM: // Renders a dialog white box with zoom
+            if (gDialogBoxState == DIALOG_STATE_OPENING || gDialogBoxState == DIALOG_STATE_CLOSING) {
+                sInterpolatedDialogZoomPos = gDisplayListHead;
+                if (gDialogBoxState == DIALOG_STATE_OPENING) {
+                    sInterpolatedDialogScale = gDialogBoxScale - 2 / 2;
+                } else {
+                    sInterpolatedDialogScale = gDialogBoxScale + 2 / 2;
+                }
+                create_dl_translation_matrix(MENU_MTX_NOPUSH, 65.0 - (65.0 / gDialogBoxScale),
+                                              (40.0 / gDialogBoxScale) - 40, 0);
+                create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.0 / gDialogBoxScale, 1.0 / gDialogBoxScale, 1.0f);
+            }
+            gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 150);
+            break;
+    }
+
+    create_dl_translation_matrix(MENU_MTX_PUSH, X_VAL1, Y_VAL1, 0);
+    create_dl_scale_matrix(MENU_MTX_NOPUSH, 1.1f, ((f32) linesPerBox / Y_VAL2) + 0.1, 1.0f);
+
+    gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
+    gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
+}
+#else
 void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
     UNUSED s32 unused;
 
@@ -959,6 +1050,7 @@ void render_dialog_box_type(struct DialogEntry *dialog, s8 linesPerBox) {
     gSPDisplayList(gDisplayListHead++, dl_draw_text_bg_box);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 }
+#endif
 
 void change_and_flash_dialog_text_color_lines(s8 colorMode, s8 lineNum) {
     u8 colorFade;
@@ -1227,6 +1319,10 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
 #ifdef VERSION_EU
         gDialogY -= gDialogScrollOffsetY;
 #else
+#ifdef HIGHFPS
+        sInterpolatedDialogOffset = gDialogScrollOffsetY + dialog->linesPerBox;
+        sInterpolatedDialogOffsetPos = gDisplayListHead;
+#endif
         create_dl_translation_matrix(MENU_MTX_NOPUSH, 0, (f32) gDialogScrollOffsetY, 0);
 #endif
     }
@@ -2328,7 +2424,7 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     if (gDialogLineNum < COURSE_STAGES_COUNT) {
         courseName = segmented_to_virtual(courseNameTbl[gDialogLineNum]);
         render_pause_castle_course_stars(x, y, gCurrSaveFileNum - 1, gDialogLineNum);
-        print_generic_string(x + 34, y - 5, get_key_string("TEXT_STAR"));
+        print_generic_string(x + 34, y - 5, get_key_string("TEXT_COIN_X"));
         int_to_str(save_file_get_course_coin_score(gCurrSaveFileNum - 1, gDialogLineNum), strVal);
         print_generic_string(x + 54, y - 5, strVal);
     } else {        
@@ -2601,8 +2697,8 @@ void render_course_complete_lvl_info_and_hud_str(void) {
 #define TXT_SAVEOPTIONS_X x + 12
 #define TXT_SAVECONT_Y 0
 #define TXT_SAVEQUIT_Y 20
-#define TXT_SAVE_EXIT_GAME_Y 40
-#define TXT_CONTNOSAVE_Y 60
+#define TXT_CONTNOSAVE_Y 40
+#define TXT_SAVE_EXIT_GAME_Y 60
 
 #define X_VAL9 x
 
@@ -2614,8 +2710,8 @@ void render_save_confirmation(s16 x, s16 y, s8 *index, s16 sp6e) {
 
     print_generic_string(TXT_SAVEOPTIONS_X, y + TXT_SAVECONT_Y, get_key_string("TEXT_SAVE_AND_CONTINUE"));
     print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVEQUIT_Y, get_key_string("TEXT_SAVE_AND_QUIT"));
-    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVE_EXIT_GAME_Y, get_key_string("TEXT_SAVE_EXIT_GAME"));
     print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_CONTNOSAVE_Y, get_key_string("TEXT_CONTINUE_WITHOUT_SAVING"));
+    print_generic_string(TXT_SAVEOPTIONS_X, y - TXT_SAVE_EXIT_GAME_Y, get_key_string("TEXT_SAVE_EXIT_GAME"));
 
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
 

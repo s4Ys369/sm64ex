@@ -1,4 +1,4 @@
-{
+{   
     "manifest": {
         "langName": "Portuguese",
         "langLogo": "none"
@@ -95,10 +95,10 @@
                 "Outros inimigos estão guardando",
                 "as outras Power Stars. Se",
                 "você restaurar mais Stars,",
-                "você pode abrir novas portas",
-                "isso levará para novos mundos!",
+                "você pode abrir novas portas.",
+                "Isso levará para novos mundos!",
                 "Meus Bob-omb Buddies estão",
-                "esperando por você. certifique-se",
+                "esperando por você. Certifique-se",
                 "de falar com eles--eles irão",
                 "liberar os canhões para você."
             ]
@@ -114,7 +114,7 @@
                 "canhões.",
                 "Mas se você quiser",
                 "se atirar, siga em",
-                "frente. Ajude-se.",
+                "frente. Cuide-se.",
                 "Nós iremos deixar tudo",
                 "pronto nos canhões deste nível",
                 "para você usar. Bon Voyage!"
@@ -139,7 +139,7 @@
                 "topo da montanha, onde",
                 "Big Bob-omb esteve?",
                 "O que diz? Quando eu disser",
-                "『Go,』 vamos começar a corrida!",
+                "『Já,』 vamos começar a corrida!",
                 "",
                 "Preparar....",
                 "",
@@ -155,7 +155,7 @@
                 "Ei!!! Não tente me sacanear!!!",
                 "Você deve correr",
                 "por todo o curso.",
-                "Após isso. Veja quando",
+                "Após isso, veja quando",
                 "você irá correr de",
                 "verdade."
             ]
@@ -206,8 +206,8 @@
                 "o poder das Power Stars?",
                 "Eu me senti mal após",
                 "perder a última",
-                "corrida. Este é meu lar",
-                "nível--que tal uma",
+                "corrida. Este é meu nível-",
+                "lar--que tal uma",
                 "revanche?",
                 "O objetivo está em",
                 "Windswept Valley.",
@@ -262,7 +262,7 @@
             "lines": [
                 "Você pisou no",
                 "botão de Vanish Cap.",
-                "A Vanish Cap faze com que",
+                "A Vanish Cap faz com que",
                 "Mario desapareça.",
                 "Agora os blocos azuis",
                 "de Vanish Cap que você achar",
@@ -294,7 +294,7 @@
             "lines": [
                 "Wow! Outra Power Star!",
                 "Mario ganha mais coragem",
-                "da Power Start",
+                "da Power Star",
                 "para o castelo.",
                 "Gostaria de salvar?",
                 "",
@@ -336,12 +336,12 @@
             "lines": [
                 "Eu sou Big Bob-omb, lord",
                 "de todas as coisas explosivas,",
-                "king dos ka-booms do",
+                "rei dos ka-booms do",
                 "mundo a fora!",
                 "Como pode escalar minha",
                 "montanha? Com que direito",
-                "você pisa na minha",
-                "imperial topo-da-montanha?",
+                "você pisa na meu",
+                "topo imperial?",
                 "Você pode ter feito meus",
                 "guardas de trouxas, mas nunca irá",
                 "escapar de mim...",
@@ -355,7 +355,7 @@
                 "seu valor em batalha.",
                 "",
                 "Você pode me pegar",
-                "e me jogar nesse",
+                "e me jogar neste",
                 "território real? Eu acho",
                 "que não!"
             ]
@@ -404,7 +404,7 @@
             "lines": [
                 "Bem-vindo.",
                 "Ninguém está em casa!",
-                "Agora vaza--",
+                "Agora cai fora--",
                 "e não volte mais!",
                 "Gwa ha ha!"
             ]
@@ -425,7 +425,7 @@
             "leftOffset": 95,
             "width": 200,
             "lines": [
-                "Essa chave não encaixa!",
+                "Esta chave não encaixa!",
                 "Talvez seja para o",
                 "porão..."
             ]
@@ -436,7 +436,7 @@
             "leftOffset": 95,
             "width": 200,
             "lines": [
-                "Você precisa do poder da estrela para",
+                "Você precisa da Power Star para",
                 "abrir a porta. Restaure uma",
                 "Power Star de um inimigo",
                 "dentro de um quadro do",
@@ -498,7 +498,7 @@
             "width": 200,
             "lines": [
                 "Para abrir a porta que",
-                "leva para escadaria 『sem fim』",
+                "leva à escadaria 『sem fim』",
                 "você precisa de 70",
                 "Power Stars.",
                 "Bwa ha ha!"
@@ -510,27 +510,27 @@
             "leftOffset": 30,
             "width": 200,
             "lines": [
-                "Olá! Aqui o Lakitu Bros.,",
+                "Olá! Aqui é o Lakitu Bros.,",
                 "com atualização ao vivo",
                 "do progresso de",
                 "Mario. Ele está prestes a",
                 "aprender uma técnica para",
                 "pegar inimigos de surpresa.",
-                "O truque é esse: Ele deve",
+                "O truque é esse: ele deve",
                 "andar devagar para que",
                 "ande silenciosamente.",
                 "",
                 "",
                 "",
                 "E fechando o filme",
-                "técnicas serão reportadas",
-                "previamente, você pode dar",
+                "técnicas reportadas",
+                "anteriormente, você pode dar",
                 "uma olhada em volta com [C]> e",
                 "[C]<. Pressione [C]| para visualizar a",
                 "ação de uma distância.",
                 "Quando você não puder mais",
                 "mover a câmera, um",
-                "som irá disparar. Esse é",
+                "som irá disparar. Aqui é",
                 "o Lakitu Bros.,",
                 "desligando."
             ]
@@ -558,7 +558,7 @@
             "leftOffset": 30,
             "width": 200,
             "lines": [
-                "se você conseguir a Wing Cap,",
+                "Se você conseguir a Wing Cap,",
                 "você pode voar! Coloque a Cap",
                 "e então execute o pulo",
                 "triplo--pule três vezes",
@@ -774,7 +774,7 @@
                 "",
                 "Você pode pular para a ponta",
                 "do penhasco e segurar,",
-                "e você pode escala a",
+                "e você pode escalar a",
                 "ponta se você mover devagar.",
                 "Quando você desejar ir,",
                 "pressione [Z] ou pressione",
@@ -814,7 +814,7 @@
                 "acordada, por que não",
                 "pegar um pequeno voo comigo?",
                 "Pressione e segure [A] para agarrar",
-                "Solte [A] para deixar.",
+                "Solte [A] para largar.",
                 "Eu te levo para onde",
                 "você desejar, desde que",
                 "minhas asas possam suportar.",
@@ -854,7 +854,7 @@
                 "e então pular mais alto.",
                 "Próximo, pulo em distância",
                 "with Long Jump. Corra,",
-                "pressione [Z] to abaixar e então [A]",
+                "pressione [Z] para abaixar e então [A]",
                 "para saltar longe.",
                 "",
                 "Para fazer Wall Kick, pressione",
@@ -886,7 +886,7 @@
             "width": 200,
             "lines": [
                 "Temporada na Snow Mountain",
-                "Cuidade com as condições",
+                "Cuidado com as condições",
                 "escorregadias! Por favor, entre",
                 "na cabana primeiro."
             ]
@@ -924,7 +924,7 @@
                 "saltar, você irá executar o",
                 "Backward Somersault!",
                 "Sacou?",
-                "Tem mais. Abaixe and",
+                "Tem mais. Abaixe e",
                 "então salte para executar o",
                 "Long Jump! Ou abaixe e",
                 "ande para...deixa pra lá."
@@ -968,7 +968,7 @@
                 "Somersault, corra, faça",
                 "faça uma curva em U e pule.",
                 "Você pode pegar bastante",
-                "ar com ambos os pulos."
+                "altura com ambos os pulos."
             ]
         },
         {
@@ -978,7 +978,7 @@
             "width": 200,
             "lines": [
                 "Às vezes, se você passar",
-                "através de um anel vermelho ou",
+                "através de um anel de moedas ou",
                 "encontrar um ponto secreto em um",
                 "nível, um número vermelho irá",
                 "aparecer.",
@@ -996,7 +996,7 @@
                 "Bem-vindo à neve",
                 "deslize! Salte! Para velocidade",
                 "cima, pressione para frente",
-                "no analógico. To ir devagar",
+                "no analógico. Para ir devagar",
                 "trás e puxe de volta."
             ]
         },
@@ -1052,7 +1052,7 @@
                 "bico...) Eu não",
                 "lembro quando deixer",
                 "ela.",
-                "Vamos ver...I parei",
+                "Vamos ver...Eu parei",
                 "para peixes e cubos de gelo,",
                 "E então...oohh! Eu",
                 "não sei!"
@@ -1131,7 +1131,7 @@
                 "BRRR! Perigo de congelamento!",
                 "Não nade aqui.",
                 "Estou falando sério.",
-                "/--The Pinguim"
+                "/--O Pinguim"
             ]
         },
         {
@@ -1388,7 +1388,7 @@
                 "",
                 "Eu nunca irei dizer!",
                 "",
-                "//--The Cap'n"
+                "//--O Capitão"
             ]
         },
         {
@@ -1542,7 +1542,7 @@
                 "ou no molhado.",
                 "E onde a solução",
                 "se esconde?",
-                "The cidade recepciona os visitantes",
+                "A cidade recepciona os visitantes",
                 "com a profundidade que",
                 "elas entram."
             ]
@@ -1553,7 +1553,7 @@
             "leftOffset": 30,
             "width": 200,
             "lines": [
-                "Cuidado com o boina! Se",
+                "Cuidado com a boina! Se",
                 "você perder, você irá",
                 "levar dano facilmente.",
                 "",
@@ -2942,7 +2942,7 @@
                 "castelo?",
                 "E salvou a princesa?",
                 "Eu sabia que poderia fazer isso!",
-                "Agora eu tenho um mensagem",
+                "Agora eu tenho uma mensagem",
                 "muito especial para você.",
                 "『Obrigado por jogar Super",
                 "Mario 64! Esse é o",
@@ -3108,7 +3108,7 @@
                 "TEMPORADA DO BIG BOB-OMB",
                 "CORRIDA A PÉ COM KOOPA THE QUICK",
                 "ATIRAR PARA A ILHA NO CÉU",
-                "ENTRE AS 8 MOEDAS VERMELHAS",
+                "ENCONTRE AS 8 MOEDAS VERMELHAS",
                 "MARIO WINGS NO CÉU",
                 "POR TRÁS DO PORTÃO DO CHAIN CHOMP"
             ]
@@ -3141,7 +3141,7 @@
                 "ESCORREGANDO COM TUDO",
                 "PINGUIM LI'L PERDIDO",
                 "CORRIDA DO GRANDE PINGUIM",
-                "DESCIDA CONGELADO PARA 8 MOEDAS VERMELHAS",
+                "DESCIDA CONGELADA PARA 8 MOEDAS VERMELHAS",
                 "BONECO DE NEVE PERDEU A CABEÇA",
                 "WALL KICKS IRÃO FUNCIONAR"
             ]
@@ -3226,7 +3226,7 @@
         {
             "course": "12 MONTANHA ALTA",
             "acts": [
-                "ESCALE A MOUNTAIN",
+                "ESCALE A MONTANHA",
                 "MISTÉRIO DA GAIOLA DO MACACO",
                 "MOEDAS VERMELHAS DOS COGUMELOS TENSOS",
                 "LADO MISTERIOSO DA MONTANHA",
@@ -3279,47 +3279,46 @@
         "   VANISH CAP ABAIXO DA PONTE",
         "   WING MARIO ALÉM DO ARCO-ÍRIS",
         "   O AQUÁRIO SECRETO",
-        null,
         "   ESTRELAS SECRETAS DO CASTELO"
     ],
     "options": {
-        "TEXT_OPT_OPTIONS": "OPÇÕES",
-        "TEXT_OPT_CAMERA": "CÂMERA",
-        "TEXT_OPT_CONTROLS": "CONTROLES",
+        "TEXT_OPT_OPTIONS": "OPTIONS",
+        "TEXT_OPT_CAMERA": "CAMERA",
+        "TEXT_OPT_CONTROLS": "CONTROLS",
         "TEXT_OPT_VIDEO": "DISPLAY",
-        "TEXT_OPT_AUDIO": "SOM",
+        "TEXT_OPT_AUDIO": "SOUND",
         "TEXT_OPT_CHEATS": "CHEATS",
         "TEXT_OPT_HIGHLIGHT": "O",
         "TEXT_OPT_UNBOUND": "NONE",
         "TEXT_OPT_PRESSKEY": "...",
-        "TEXT_OPT_BUTTON1": "[R] Opções",
-        "TEXT_OPT_BUTTON2": "[R] Retornar",
-        "TEXT_OPT_ENABLED": "Habilitado",
-        "TEXT_OPT_DISABLED": "Desabilitado",
-        "TEXT_OPT_CAMX": "Sensibilidade - Câmera X",
-        "TEXT_OPT_CAMY": "Sensibilidade - Câmera Y",
-        "TEXT_OPT_INVERTX": "Inverter Eixo X",
-        "TEXT_OPT_INVERTY": "Inverter Eixo Y",
+        "TEXT_OPT_BUTTON1": "[R] Options",
+        "TEXT_OPT_BUTTON2": "[R] Return",
+        "TEXT_OPT_ENABLED": "Enabled",
+        "TEXT_OPT_DISABLED": "Disabled",
+        "TEXT_OPT_CAMX": "Camera X Sensitivity",
+        "TEXT_OPT_CAMY": "Camera Y Sensitivity",
+        "TEXT_OPT_INVERTX": "Invert X Axis",
+        "TEXT_OPT_INVERTY": "Invert Y Axis",
         "TEXT_OPT_CAMC": "Camera Centre Aggression",
         "TEXT_OPT_CAMP": "Camera Pan Level",
         "TEXT_OPT_CAMD": "Camera Deceleration",
         "TEXT_OPT_CAMON": "Free Camera",
         "TEXT_OPT_ANALOGUE": "Analogue Camera",
         "TEXT_OPT_MOUSE": "Mouse Look",
-        "TEXT_OPT_TEXFILTER": "Filtro de Textura",
-        "TEXT_OPT_FSCREEN": "Tela Cheia",
+        "TEXT_OPT_TEXFILTER": "Texture Filtering",
+        "TEXT_OPT_FSCREEN": "Fullscreen",
         "TEXT_OPT_NEAREST": "Nearest",
         "TEXT_OPT_LINEAR": "Linear",
-        "TEXT_OPT_MVOLUME": "Volume Geral",
-        "TEXT_OPT_MUSVOLUME": "Volume da Música",
-        "TEXT_OPT_SFXVOLUME": "Volume de Efeitos Sonoros",
+        "TEXT_OPT_MVOLUME": "Master Volume",
+        "TEXT_OPT_MUSVOLUME": "Music Volume",
+        "TEXT_OPT_SFXVOLUME": "Sfx Volume",
         "TEXT_OPT_ENVVOLUME": "Env Volume",
-        "TEXT_OPT_VSYNC": "Sincronização Vertical",
+        "TEXT_OPT_VSYNC": "Vertical Sync",
         "TEXT_OPT_AUTO": "Auto",
         "TEXT_OPT_HUD": "HUD",
         "TEXT_OPT_THREEPT": "Three-point",
-        "TEXT_OPT_APPLY": "Aplicar",
-        "TEXT_OPT_RESETWND": "Resetar Janela",
+        "TEXT_OPT_APPLY": "Apply",
+        "TEXT_OPT_RESETWND": "Reset Window",
         "TEXT_BIND_A": "A Button",
         "TEXT_BIND_B": "B Button",
         "TEXT_BIND_START": "Start Button",
@@ -3346,7 +3345,9 @@
         "TEXT_OPT_CHEAT8": "Huge Mario",
         "TEXT_OPT_CHEAT9": "Tiny Mario",
         "TEXT_OPT_GAME": "JOGO",
-        "TEXT_OPT_LANGUAGE": "Idioma atual"
+        "TEXT_OPT_LANGUAGE": "Idioma Atual",
+        "TEXT_OPT_PRECACHE": "Texturas pré-carregadas",
+        "TEXT_OPT_SWITCH_HUD": "Interface de switch"
     },
     "strings": {
         "TEXT_ZERO": "0",

@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 
+#include "mario_cheats.h"
 #include "sm64.h"
 #include "area.h"
 #include "audio/data.h"
@@ -38,6 +39,7 @@
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
 #endif
+#include "sgi/utils/characters.h"
 
 u32 unused80339F10;
 s8 filler80339F1C[20];
@@ -62,6 +64,21 @@ s32 is_anim_past_end(struct MarioState *m) {
     struct Object *o = m->marioObj;
 
     return o->header.gfx.unk38.animFrame >= (o->header.gfx.unk38.curAnim->unk08 - 2);
+}
+s32 is_metal_cap(struct MarioState *m){
+    return (m->flags & MARIO_METAL_CAP);
+}
+s32 is_vanish_cap(struct MarioState *m){
+    return (m->flags & MARIO_VANISH_CAP);
+}
+s32 is_wing_cap(struct MarioState *m){
+    return (m->flags & MARIO_WING_CAP);
+}
+s32 is_hatless(struct MarioState *m){
+    return !(m->flags & MARIO_CAP_ON_HEAD);
+}
+s32 is_moving(){
+    return( gMarioState->action & (ACT_FLAG_MOVING|ACT_FLAG_AIR) || gMarioState->action == ACT_HOLD_FREEFALL_LAND_STOP ||gMarioState->action == ACT_FREEFALL_LAND_STOP );
 }
 
 /**
@@ -793,14 +810,14 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
 
     switch (action) {
         case ACT_DOUBLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 52.0f, 0.25f);
+            set_mario_y_vel_based_on_fspeed(m, 52.0f * getCharacterMultiplier(), 0.25f);
             m->forwardVel *= 0.8f;
             break;
 
         case ACT_BACKFLIP:
             m->marioObj->header.gfx.unk38.animID = -1;
             m->forwardVel = -16.0f;
-            set_mario_y_vel_based_on_fspeed(m, 62.0f, 0.0f);
+            set_mario_y_vel_based_on_fspeed(m, 62.0f * getCharacterMultiplier(), 0.0f);
             break;
 
         case ACT_TRIPLE_JUMP:
@@ -815,7 +832,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
         case ACT_WATER_JUMP:
         case ACT_HOLD_WATER_JUMP:
             if (actionArg == 0) {
-                set_mario_y_vel_based_on_fspeed(m, 42.0f, 0.0f);
+                set_mario_y_vel_based_on_fspeed(m, 42.0f * getCharacterMultiplier(), 0.0f);
             }
             break;
 
@@ -825,19 +842,19 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
             break;
 
         case ACT_RIDING_SHELL_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 42.0f, 0.25f);
+            set_mario_y_vel_based_on_fspeed(m, 42.0f * getCharacterMultiplier(), 0.25f);
             break;
 
         case ACT_JUMP:
         case ACT_HOLD_JUMP:
             m->marioObj->header.gfx.unk38.animID = -1;
-            set_mario_y_vel_based_on_fspeed(m, 42.0f, 0.25f);
+            set_mario_y_vel_based_on_fspeed(m, 42.0f * getCharacterMultiplier(), 0.25f);
             m->forwardVel *= 0.8f;
             break;
 
         case ACT_WALL_KICK_AIR:
         case ACT_TOP_OF_POLE_JUMP:
-            set_mario_y_vel_based_on_fspeed(m, 62.0f, 0.0f);
+            set_mario_y_vel_based_on_fspeed(m, 62.0f * getCharacterMultiplier(), 0.0f);
             if (m->forwardVel < 24.0f) {
                 m->forwardVel = 24.0f;
             }
@@ -852,7 +869,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
 
         case ACT_STEEP_JUMP:
             m->marioObj->header.gfx.unk38.animID = -1;
-            set_mario_y_vel_based_on_fspeed(m, 42.0f, 0.25f);
+            set_mario_y_vel_based_on_fspeed(m, 42.0f * getCharacterMultiplier(), 0.25f);
             m->faceAngle[0] = -0x2000;
             break;
 
@@ -877,7 +894,7 @@ static u32 set_mario_action_airborne(struct MarioState *m, u32 action, u32 actio
 
             //! (BLJ's) This properly handles long jumps from getting forward speed with
             //  too much velocity, but misses backwards longs allowing high negative speeds.
-            if ((m->forwardVel *= 1.5f) > 48.0f) {
+            if ((m->forwardVel *= 1.5f) > 48.0f && !(Cheats.EnableCheats && Cheats.FLJ)) {
                 m->forwardVel = 48.0f;
             }
             break;
@@ -963,6 +980,10 @@ static u32 set_mario_action_cutscene(struct MarioState *m, u32 action, UNUSED u3
     switch (action) {
         case ACT_EMERGE_FROM_PIPE:
             m->vel[1] = 52.0f;
+            break;
+
+        case ACT_CHARACTER_SWITCH:
+            m->vel[1] = 64.0f;
             break;
 
         case ACT_FALL_AFTER_STAR_GRAB:
@@ -1059,6 +1080,8 @@ s32 set_jump_from_landing(struct MarioState *m) {
                     if (m->flags & MARIO_WING_CAP) {
                         set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
                     } else if (m->forwardVel > 20.0f) {
+                        set_mario_action(m, ACT_TRIPLE_JUMP, 0);
+                    } else if (Cheats.EnableCheats && JUMP_MAN == 1) {
                         set_mario_action(m, ACT_TRIPLE_JUMP, 0);
                     } else {
                         set_mario_action(m, ACT_JUMP, 0);
@@ -1223,6 +1246,10 @@ void squish_mario_model(struct MarioState *m) {
                 }
                 else if (Cheats.TinyMario) {
                     vec3f_set(m->marioObj->header.gfx.scale, 0.2f, 0.2f, 0.2f);
+                } else if (Cheats.PAC == 3) {
+                    vec3f_set(m->marioObj->header.gfx.scale, 1.5f, 1.5f, 1.5f);
+                } else if (Cheats.PAC == 5) {
+                    vec3f_set(m->marioObj->header.gfx.scale, 1.5f, 1.5f, 1.5f);
                 }
                 else {
                     vec3f_set(m->marioObj->header.gfx.scale, 1.0f, 1.0f, 1.0f);
@@ -1413,7 +1440,9 @@ void update_mario_inputs(struct MarioState *m) {
     update_mario_geometry_inputs(m);
 
     debug_print_speed_action_normal(m);
-    
+
+    cheats_mario_inputs(m);
+
     /* Moonjump cheat */
     while (Cheats.MoonJump == true && Cheats.EnableCheats == true && m->controller->buttonDown & L_TRIG ){
         m->vel[1] = 25;
@@ -1688,6 +1717,8 @@ void mario_update_hitbox_and_cap_model(struct MarioState *m) {
     // Short hitbox for crouching/crawling/etc.
     if (m->action & ACT_FLAG_SHORT_HITBOX) {
         m->marioObj->hitboxHeight = 100.0f;
+    } else if (Cheats.EnableCheats && Cheats.PAC > 0) {
+        m->marioObj->hitboxHeight = 120.0f;
     } else {
         m->marioObj->hitboxHeight = 160.0f;
     }
@@ -1929,12 +1960,19 @@ void init_mario_from_save_file(void) {
     gMarioState->statusForCamera = &gPlayerCameraState[0];
     gMarioState->marioBodyState = &gBodyStates[0];
     gMarioState->controller = &gControllers[0];
-    gMarioState->animation = &D_80339D10;
-
     gMarioState->numCoins = 0;
     gMarioState->numStars =
         save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-    gMarioState->numKeys = 0;
+    gMarioState->numKeys = save_file_get_keys(gCurrSaveFileNum - 1);
+
+    setCharacterModel(save_file_get_player_model(gCurrSaveFileNum - 1));
+
+    if (isLuigi()==1)
+        gMarioState->animation = &Data_LuigiAnims;
+    else
+        gMarioState->animation = &D_80339D10;
+
+    set_notification_status(save_file_get_keys(gCurrSaveFileNum - 1) >= 10);
 
     gMarioState->numLives = 4;
     gMarioState->health = 0x880;

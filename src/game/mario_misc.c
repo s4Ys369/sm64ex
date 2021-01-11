@@ -1,6 +1,7 @@
 #include <PR/ultratypes.h>
 
 #include "sm64.h"
+#include "pc/cheats.h"
 #include "area.h"
 #include "audio/external.h"
 #include "behavior_actions.h"
@@ -23,6 +24,7 @@
 #include "save_file.h"
 #include "skybox.h"
 #include "sound_init.h"
+#include "sgi/utils/characters.h"
 
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
@@ -232,7 +234,11 @@ void bhv_unlock_door_star_init(void) {
     gCurrentObject->oUnlockDoorStarTimer = 0;
     gCurrentObject->oUnlockDoorStarYawVel = 0x1000;
     gCurrentObject->oPosX += 30.0f * sins(gMarioState->faceAngle[1] - 0x4000);
-    gCurrentObject->oPosY += 160.0f;
+    if (Cheats.EnableCheats && Cheats.PAC > 0) {
+        gCurrentObject->oPosY += 120.0f;
+    } else {
+        gCurrentObject->oPosY += 160.0f;
+    }
     gCurrentObject->oPosZ += 30.0f * coss(gMarioState->faceAngle[1] - 0x4000);
     gCurrentObject->oMoveAngleYaw = 0x7800;
     obj_scale(gCurrentObject, 0.5f);
@@ -390,9 +396,13 @@ Gfx *geo_mario_tilt_torso(s32 callContext, struct GraphNode *node, UNUSED Mat4 *
             && action != ACT_RIDING_SHELL_GROUND) {
             vec3s_copy(bodyState->torsoAngle, gVec3sZero);
         }
-        rotNode->rotation[0] = bodyState->torsoAngle[1];
-        rotNode->rotation[1] = bodyState->torsoAngle[2];
-        rotNode->rotation[2] = bodyState->torsoAngle[0];
+        if (isLuigi()==1){
+        }
+        else {
+            rotNode->rotation[0] = bodyState->torsoAngle[1];
+            rotNode->rotation[1] = bodyState->torsoAngle[2];
+            rotNode->rotation[2] = bodyState->torsoAngle[0];
+        }
     }
     return NULL;
 }

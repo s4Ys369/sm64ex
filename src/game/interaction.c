@@ -1,5 +1,6 @@
 #include <PR/ultratypes.h>
 
+#include "pc/cheats.h"
 #include "area.h"
 #include "actors/common1.h"
 #include "audio/external.h"
@@ -14,6 +15,7 @@
 #include "interaction.h"
 #include "level_update.h"
 #include "mario.h"
+#include "mario_cheats.h"
 #include "mario_step.h"
 #include "memory.h"
 #include "obj_behaviors.h"
@@ -23,6 +25,8 @@
 #include "sm64.h"
 #include "sound_init.h"
 #include "thread6.h"
+
+#include "sgi/utils/characters.h"
 
 #define INT_GROUND_POUND_OR_TWIRL (1 << 0) // 0x01
 #define INT_PUNCH                 (1 << 1) // 0x02
@@ -112,7 +116,7 @@ static struct InteractionHandler sInteractionHandlers[] = {
     { INTERACT_UNKNOWN_08,     interact_unknown_08 },
     { INTERACT_CAP,            interact_cap },
     { INTERACT_GRABBABLE,      interact_grabbable },
-    { INTERACT_TEXT,           interact_text },
+    { INTERACT_TEXT,           interact_text }
 };
 
 static u32 sForwardKnockbackActions[][3] = {
@@ -351,8 +355,13 @@ void mario_blow_off_cap(struct MarioState *m, f32 capSpeed) {
         save_file_set_cap_pos(m->pos[0], m->pos[1], m->pos[2]);
 
         m->flags &= ~(MARIO_NORMAL_CAP | MARIO_CAP_ON_HEAD);
-
-        capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+		
+		if(isLuigi()==1) {
+			capObject = spawn_object(m->marioObj, MODEL_LUIGIS_CAP, bhvNormalCap);
+		}
+		else {
+			capObject = spawn_object(m->marioObj, MODEL_MARIOS_CAP, bhvNormalCap);
+		}
 
         capObject->oPosY += (m->action & ACT_FLAG_SHORT_HITBOX) ? 120.0f : 180.0f;
         capObject->oForwardVel = capSpeed;
@@ -805,7 +814,7 @@ u32 interact_star_or_key(struct MarioState *m, UNUSED u32 interactType, struct O
 
         m->numStars =
             save_file_get_total_star_count(gCurrSaveFileNum - 1, COURSE_MIN - 1, COURSE_MAX - 1);
-
+			
         if (!noExit) {
             drop_queued_background_music();
             fadeout_level_music(126);
@@ -870,6 +879,40 @@ u32 interact_warp(struct MarioState *m, UNUSED u32 interactType, struct Object *
             m->interactObj = o;
             m->usedObj = o;
 
+			if(o->oObjectID == 1){
+				o->oInteractStatus = INT_STATUS_INTERACTED;
+				m->interactObj = o;
+				m->usedObj = o;
+	
+				if (o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)) {
+					play_sound(SOUND_MENU_ENTER_PIPE, m->marioObj->header.gfx.cameraToObject);
+					queue_rumble_data(15, 80);
+				} else {
+					play_sound(SOUND_MENU_ENTER_HOLE, m->marioObj->header.gfx.cameraToObject);
+					queue_rumble_data(12, 80);
+				}
+	
+				mario_stop_riding_object(m);
+				play_transition(WARP_TRANSITION_FADE_INTO_MARIO, 0x15, 0x00, 0x00, 0x00);
+				u32 animation;
+	
+				if(m->numKeys >= 10){
+                    s32 characterModel = getCharacterType() == MARIO ? LUIGI : MARIO;
+                    setCharacterModel(characterModel);
+                    save_file_update_player_model(gCurrSaveFileNum - 1, characterModel);
+                    if (isLuigi()==1)
+                        gMarioState->animation = &Data_LuigiAnims;
+                    else
+                        gMarioState->animation = &D_80339D10;
+                    
+                    m->marioObj->header.gfx.sharedChild = gLoadedGraphNodes[MODEL_PLAYER];	
+					animation = set_mario_action(m, ACT_CHARACTER_SWITCH, TRUE);
+				}else{
+					animation = set_mario_action(m, ACT_CHARACTER_SWITCH, FALSE);
+				}
+	
+				return animation;
+			}
             if (o->collisionData == segmented_to_virtual(warp_pipe_seg3_collision_03009AC8)) {
                 play_sound(SOUND_MENU_ENTER_PIPE, m->marioObj->header.gfx.cameraToObject);
                 queue_rumble_data(15, 80);
@@ -1777,21 +1820,26 @@ void mario_process_interactions(struct MarioState *m) {
 }
 
 void check_death_barrier(struct MarioState *m) {
-    if (m->pos[1] < m->floorHeight + 2048.0f) {
-        if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_UNKNOWN_18)) {
-            play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+    while (Cheats.NDB == false) {
+        if (m->pos[1] < m->floorHeight + 2048.0f) {
+            if (level_trigger_warp(m, WARP_OP_WARP_FLOOR) == 20 && !(m->flags & MARIO_UNKNOWN_18)) {
+                play_sound(SOUND_MARIO_WAAAOOOW, m->marioObj->header.gfx.cameraToObject);
+            }
         }
+        break;
     }
 }
 
 void check_lava_boost(struct MarioState *m) {
-    if (!(m->action & ACT_FLAG_RIDING_SHELL) && m->pos[1] < m->floorHeight + 10.0f) {
-        if (!(m->flags & MARIO_METAL_CAP)) {
-            m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
-        }
+    if (!(Cheats.EnableCheats && HAZ_WALK == 1)) {
+        if (!(m->action & ACT_FLAG_RIDING_SHELL) && m->pos[1] < m->floorHeight + 10.0f) {
+            if (!(m->flags & MARIO_METAL_CAP)) {
+                m->hurtCounter += (m->flags & MARIO_CAP_ON_HEAD) ? 12 : 18;
+            }
 
-        update_mario_sound_and_camera(m);
-        drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0);
+            update_mario_sound_and_camera(m);
+            drop_and_set_mario_action(m, ACT_LAVA_BOOST, 0);
+        }
     }
 }
 
@@ -1845,6 +1893,9 @@ void mario_handle_special_floors(struct MarioState *m) {
         if (!(m->action & ACT_FLAG_AIR) && !(m->action & ACT_FLAG_SWIMMING)) {
             switch (floorType) {
                 case SURFACE_BURNING:
+                    if (Cheats.EnableCheats && HAZ_WALK == 1) {
+                        break;
+                    }
                     check_lava_boost(m);
                     break;
             }

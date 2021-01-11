@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <ultra64.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -937,6 +938,12 @@ void gd_exit(UNUSED s32 code) {
 
 /* 24A1D4 -> 24A220; orig name: func_8019BA04 */
 void gd_free(void *ptr) {
+    /*C MEM*/
+    sAllocMemory -= sizeof(ptr);
+    free(ptr);
+    return;
+    /*C MEM*/
+
     sAllocMemory -= gd_free_mem(ptr);
 }
 
@@ -961,6 +968,12 @@ void *gd_allocblock(u32 size) {
 
 /* 24A318 -> 24A3E8 */
 void *gd_malloc(u32 size, u8 perm) {
+    /*C MEM*/
+    size = ALIGN(size, 8);
+    sAllocMemory += size;
+    return malloc(size);
+    /*C MEM*/
+
     void *ptr; // 1c
     size = ALIGN(size, 8);
     ptr = gd_request_mem(size, perm);
@@ -3113,7 +3126,7 @@ void gd_init(void) {
     remove_all_timers();
 
     start_memtracker("Static DL");
-    sStaticDl = new_gd_dl(0, 1900, 4000, 1, 300, 8);
+    sStaticDl = new_gd_dl(0, 8912, 18763, 1, 300, 8);
     stop_memtracker("Static DL");
 
     start_memtracker("Dynamic DLs");

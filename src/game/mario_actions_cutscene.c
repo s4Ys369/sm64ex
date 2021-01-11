@@ -32,7 +32,7 @@
 #include "pc/pc_main.h"
 
 // TODO: put this elsewhere
-enum SaveOption { SAVE_OPT_SAVE_AND_CONTINUE = 1, SAVE_OPT_SAVE_AND_QUIT, SAVE_OPT_SAVE_EXIT_GAME, SAVE_OPT_CONTINUE_DONT_SAVE };
+enum SaveOption { SAVE_OPT_SAVE_AND_CONTINUE = 1, SAVE_OPT_SAVE_AND_QUIT, SAVE_OPT_CONTINUE_DONT_SAVE, SAVE_OPT_SAVE_EXIT_GAME };
 
 static struct Object *sIntroWarpPipeObj;
 static struct Object *sEndPeachObj;
@@ -551,18 +551,18 @@ s32 act_debug_free_move(struct MarioState *m) {
     u32 action;
 
     // integer immediates, generates convert instructions for some reason
-    speed = gPlayer1Controller->buttonDown & B_BUTTON ? 4 : 1;
-    if (gPlayer1Controller->buttonDown & L_TRIG) {
+    speed = gPlayer1Controller->buttonDown & L_TRIG ? 4 : 1;
+    if (gPlayer1Controller->buttonDown & R_TRIG) {
         speed = 0.01f;
     }
 
-    set_mario_animation(m, MARIO_ANIM_A_POSE);
+    set_mario_animation(m, MARIO_ANIM_BREAKDANCE);
     vec3f_copy(pos, m->pos);
 
-    if (gPlayer1Controller->buttonDown & U_JPAD) {
+    if (gPlayer1Controller->buttonDown & A_BUTTON) {
         pos[1] += 16.0f * speed;
     }
-    if (gPlayer1Controller->buttonDown & D_JPAD) {
+    if (gPlayer1Controller->buttonDown & Z_TRIG) {
         pos[1] -= 16.0f * speed;
     }
 
@@ -585,7 +585,7 @@ s32 act_debug_free_move(struct MarioState *m) {
     vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
     vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
 
-    if (gPlayer1Controller->buttonPressed == A_BUTTON) {
+    if (gPlayer1Controller->buttonPressed == B_BUTTON) {
         if (m->pos[1] <= m->waterLevel - 100) {
             action = ACT_WATER_IDLE;
         } else {
@@ -982,6 +982,68 @@ s32 act_warp_door_spawn(struct MarioState *m) {
     stop_and_set_height_to_floor(m);
     return FALSE;
 }
+
+s32 alreadyPlayed = FALSE;
+
+s32 act_character_switch(struct MarioState *m) {
+    struct Object *marioObj = m->marioObj;
+
+    if (m->actionTimer++ < 33) {
+        marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+        return FALSE;
+    }
+
+    marioObj->header.gfx.node.flags |= GRAPH_RENDER_ACTIVE;
+
+    if (gCurrLevelNum == LEVEL_THI) {
+        if (gCurrAreaIndex == 2) {
+            play_sound_if_no_flag(m, SOUND_MENU_EXIT_PIPE, MARIO_ACTION_SOUND_PLAYED);
+        } else {
+            play_sound_if_no_flag(m, SOUND_MENU_ENTER_PIPE, MARIO_ACTION_SOUND_PLAYED);
+        }
+    }
+
+    if(m->actionArg){
+        if(!alreadyPlayed){
+            play_sound_if_no_flag(m, SOUND_MARIO_YAHOO, MARIO_MARIO_SOUND_PLAYED);
+
+            play_cutscene_music(SEQUENCE_ARGS(15, SEQ_EVENT_SOLVE_PUZZLE ));
+            play_transition(WARP_TRANSITION_FADE_FROM_MARIO, 0x14, 0x00, 0x00, 0x00);
+            alreadyPlayed = TRUE;
+        }
+
+        m->faceAngle[1] = -32.0f;
+
+        if (launch_mario_until_land(m, ACT_JUMP_LAND_STOP, MARIO_ANIM_SINGLE_JUMP, 24.0f)) {
+            mario_set_forward_vel(m, 0.0f);
+            play_mario_landing_sound(m, SOUND_ACTION_TERRAIN_LANDING);
+            alreadyPlayed = FALSE;
+        }
+
+        m->particleFlags |= PARTICLE_SPARKLES;
+    }else{
+        if(!alreadyPlayed){
+            play_sound(SOUND_MENU_BOWSER_LAUGH, gDefaultSoundArgs);
+            play_transition(WARP_TRANSITION_FADE_FROM_BOWSER, 0x12, 0x00, 0x00, 0x00);
+            // TODO: Add this
+            // create_dialog_box(DIALOG_033);
+            alreadyPlayed = TRUE;
+        }
+
+        if (m->actionTimer++ < 11) {
+            marioObj->header.gfx.node.flags &= ~GRAPH_RENDER_ACTIVE;
+            return FALSE;
+        }
+
+        if (launch_mario_until_land(m, ACT_HARD_BACKWARD_GROUND_KB, MARIO_ANIM_BACKWARD_AIR_KB, -18.0f)) {
+            queue_rumble_data(5, 80);
+            alreadyPlayed = FALSE;
+        }
+    }
+
+    return FALSE;
+}
+
 
 s32 act_emerge_from_pipe(struct MarioState *m) {
     struct Object *marioObj = m->marioObj;
@@ -2515,13 +2577,13 @@ static s32 act_end_peach_cutscene(struct MarioState *m) {
 }
 
 #ifdef VERSION_EU
-    #define TIMER_CREDITS_SHOW      51
-    #define TIMER_CREDITS_PROGRESS  80
-    #define TIMER_CREDITS_WARP     160
+    #define TIMER_CREDITS_SHOW      64
+    #define TIMER_CREDITS_PROGRESS  93
+    #define TIMER_CREDITS_WARP     173
 #else
-    #define TIMER_CREDITS_SHOW      61
-    #define TIMER_CREDITS_PROGRESS  90
-    #define TIMER_CREDITS_WARP     200
+    #define TIMER_CREDITS_SHOW      74
+    #define TIMER_CREDITS_PROGRESS 103
+    #define TIMER_CREDITS_WARP     213
 #endif
 
 static s32 act_credits_cutscene(struct MarioState *m) {
@@ -2663,6 +2725,9 @@ s32 mario_execute_cutscene_action(struct MarioState *m) {
         case ACT_PUSHING_DOOR:               cancel = act_going_through_door(m);         break;
         case ACT_WARP_DOOR_SPAWN:            cancel = act_warp_door_spawn(m);            break;
         case ACT_EMERGE_FROM_PIPE:           cancel = act_emerge_from_pipe(m);           break;
+
+		case ACT_CHARACTER_SWITCH:           cancel = act_character_switch(m);           break;
+
         case ACT_SPAWN_SPIN_AIRBORNE:        cancel = act_spawn_spin_airborne(m);        break;
         case ACT_SPAWN_SPIN_LANDING:         cancel = act_spawn_spin_landing(m);         break;
         case ACT_EXIT_AIRBORNE:              cancel = act_exit_airborne(m);              break;

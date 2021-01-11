@@ -39,6 +39,10 @@
 #include "pc/discord/discordrpc.h"
 #endif
 
+#ifdef TARGET_SWITCH
+#include "nx/m_nx.h"
+#endif
+
 #include "text/text-loader.h"
 
 OSMesg D_80339BEC;
@@ -85,6 +89,28 @@ void send_display_list(struct SPTask *spTask) {
 #define SAMPLES_LOW 528
 #endif
 
+#ifdef HIGHFPS
+static inline void patch_interpolations(void) {
+    extern void mtx_patch_interpolated(void);
+    extern void patch_screen_transition_interpolated(void);
+    extern void patch_title_screen_scales(void);
+    extern void patch_interpolated_dialog(void);
+    extern void patch_interpolated_hud(void);
+    extern void patch_interpolated_paintings(void);
+    extern void patch_interpolated_bubble_particles(void);
+    extern void patch_interpolated_snow_particles(void);
+    mtx_patch_interpolated();
+    patch_screen_transition_interpolated();
+    patch_title_screen_scales();
+    patch_interpolated_dialog();
+    patch_interpolated_hud();
+    patch_interpolated_paintings();
+    patch_interpolated_bubble_particles();
+    patch_interpolated_snow_particles();
+}
+
+#endif
+
 void produce_one_frame(void) {
     gfx_start_frame();
 
@@ -95,6 +121,10 @@ void produce_one_frame(void) {
 
     game_loop_one_iteration();
     thread6_rumble_loop(NULL);
+
+#ifdef TARGET_SWITCH
+    controller_nx_rumble_loop();
+#endif
 
     int samples_left = audio_api->buffered();
     u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
@@ -112,6 +142,12 @@ void produce_one_frame(void) {
     audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
 
     gfx_end_frame();
+#ifdef HIGHFPS
+    gfx_start_frame();
+    patch_interpolations();
+    send_display_list(gGfxSPTask);
+    gfx_end_frame();
+#endif
 }
 
 void audio_shutdown(void) {
@@ -266,7 +302,12 @@ void main_func(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+#ifdef TARGET_SWITCH
+    initNX();
+#endif
     parse_cli_opts(argc, argv);
     main_func(argv);
-    return 0;
+#ifdef TARGET_SWITCH
+    exitNX();
+#endif
 }

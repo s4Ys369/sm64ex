@@ -28,6 +28,8 @@ static const LevelScript script_func_local_1[] = {
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_0A, /*pos*/  3840,  794,  2688, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_LEVEL_GEOMETRY_0C, /*pos*/  1408, 2522,  2431, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvStaticObject),
     OBJECT(/*model*/ MODEL_WF_GIANT_POLE,     /*pos*/ -2560, 2560,  -256, /*angle*/ 0, 0, 0, /*behParam*/ 0x00000000, /*beh*/ bhvGiantPole),
+	//OBJECT(/*model*/ MODEL_BETA_BOO_KEY, /*pos*/ 1595,  2560,  1657, /*angle*/ 0, 0, 0, /*behParam*/ 1, /*beh*/ bhvBetaBooKey),
+    OBJECT_WITH_ACTS(/*model*/ MODEL_BETA_BOO_KEY, /*pos*/ -356, 3584, -21, /*angle*/ 0, 0, 0, /*behParam*/ 1, /*beh*/ bhvBetaBooKey, /*acts*/ ACT_2 | ACT_3 | ACT_4 | ACT_5 | ACT_6),
     RETURN(),
 };
 

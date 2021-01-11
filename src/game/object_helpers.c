@@ -133,6 +133,22 @@ Gfx *geo_update_layer_transparency(s32 callContext, struct GraphNode *node, UNUS
  * declare it. This is undefined behavior, but harmless in practice due to the
  * o32 calling convention.
  */
+  Gfx *geo_rotate_coin(s32 callContext, struct GraphNode *node, UNUSED Mat4 *c) {
+    struct Object *obj;
+
+    if (callContext == GEO_CONTEXT_RENDER) {
+        obj = (struct Object *) gCurGraphNodeObject; // TODO: change global type to Object pointer
+
+        struct GraphNodeRotation *rotNode = (struct GraphNodeRotation *) node->next;
+        vec3s_set(rotNode->rotation, 0, obj->oAnimState, 0);
+
+		obj->oAnimState += 0x0800;
+        if (obj->oAnimState > 0xFFFF) {
+            obj->oAnimState = 0;
+        }
+    }
+    return NULL;
+}
 #ifdef AVOID_UB
 Gfx *geo_switch_anim_state(s32 callContext, struct GraphNode *node, UNUSED void *context) {
 #else
@@ -1554,6 +1570,10 @@ void cur_obj_set_pos_to_home(void) {
     o->oPosX = o->oHomeX;
     o->oPosY = o->oHomeY;
     o->oPosZ = o->oHomeZ;
+
+#ifdef HIGHFPS
+    o->header.gfx.skipInterpolationTimestamp = gGlobalTimer;
+#endif
 }
 
 void cur_obj_set_pos_to_home_and_stop(void) {
@@ -1623,6 +1643,13 @@ static void obj_spawn_loot_coins(struct Object *obj, s32 numCoins, f32 sp30,
 
         coin = spawn_object(obj, model, coinBehavior);
         obj_translate_xz_random(coin, posJitter);
+		coin->header.gfx.angle[0] = 0;
+        coin->header.gfx.angle[1] = 0;
+        coin->header.gfx.angle[2] = 0;
+        coin->oFaceAnglePitch = 0;
+        coin->oFaceAngleYaw = 0;
+        coin->oFaceAngleRoll = 0;
+		
         coin->oPosY = spawnHeight;
         coin->oCoinUnk110 = sp30;
     }
@@ -1646,6 +1673,13 @@ void cur_obj_spawn_loot_coin_at_mario_pos(void) {
 
     coin = spawn_object(o, MODEL_YELLOW_COIN, bhvSingleCoinGetsSpawned);
     coin->oVelY = 30.0f;
+	
+	coin->header.gfx.angle[0] = 0;
+    coin->header.gfx.angle[1] = 0;
+    coin->header.gfx.angle[2] = 0;
+    coin->oFaceAnglePitch = 0;
+    coin->oFaceAngleYaw = 0;
+    coin->oFaceAngleRoll = 0;
 
     obj_copy_pos(coin, gMarioObject);
 }

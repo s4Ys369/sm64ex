@@ -46,6 +46,7 @@ uintptr_t gPhysicalZBuffer;
 void *D_80339CF0;
 void *D_80339CF4;
 struct MarioAnimation D_80339D10;
+struct LuigiAnimation Data_LuigiAnims;
 struct MarioAnimation gDemo;
 UNUSED u8 filler80339D30[0x90];
 
@@ -550,6 +551,7 @@ void setup_game_memory(void) {
     D_80339CF0 = main_pool_alloc(0x4000, MEMORY_POOL_LEFT);
     set_segment_base_addr(17, (void *) D_80339CF0);
     func_80278A78(&D_80339D10, gMarioAnims, D_80339CF0);
+    func_80278A78(&Data_LuigiAnims, gLuigiAnims, D_80339CF0);
     D_80339CF4 = main_pool_alloc(2048, MEMORY_POOL_LEFT);
     set_segment_base_addr(24, (void *) D_80339CF4);
     func_80278A78(&gDemo, gDemoInputs, D_80339CF4);

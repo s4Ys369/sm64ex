@@ -1,5 +1,5 @@
 #ifdef EXT_OPTIONS_MENU
-
+#ifdef DYNOS_INL
 #include "sm64.h"
 #include "engine/math_util.h"
 #include "audio/external.h"
@@ -8,11 +8,13 @@
 #include "game/print.h"
 #include "game/segment2.h"
 #include "game/save_file.h"
+#include "game/hud.h"
 #ifdef BETTERCAMERA
 #include "game/bettercamera.h"
 #endif
 #include "game/mario_misc.h"
 #include "game/game_init.h"
+#include "game/cheats_menu.h"
 #include "game/ingame_menu.h"
 #include "game/options_menu.h"
 #include "pc/pc_main.h"
@@ -20,9 +22,11 @@
 #include "pc/cheats.h"
 #include "pc/configfile.h"
 #include "pc/controller/controller_api.h"
-#include "text/text-loader.h"
 #include <stdbool.h>
 #include "../../include/libc/stdlib.h"
+
+#include "text/txtconv.h"
+#include "text/text-loader.h"
 
 u8 optmenu_open = 0;
 
@@ -76,6 +80,9 @@ static const u8 optsCameraStr[][32] = {
 
 static const u8 optsGameStr[][32] = {
     "TEXT_OPT_LANGUAGE"
+    "TEXT_OPT_LANGUAGE",
+    "TEXT_OPT_PRECACHE",
+    "TEXT_OPT_SWITCH_HUD"
 };
 
 static const u8 optsVideoStr[][32] = {
@@ -221,6 +228,33 @@ static void optvideo_apply(UNUSED struct Option *self, s32 arg) {
     if (!arg) configWindow.settings_changed = true;
 }
 
+
+static void setCap_Wing(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.WingCap = true;
+}
+static void setCap_Metal(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.MetalCap = true;
+}
+static void setCap_Vanish(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.VanishCap = true;
+}
+static void setCap_Remove(UNUSED struct Option *self, s32 arg) {
+    if (!arg) Cheats.RemoveCap = true;
+}
+static void setCap_Normal(UNUSED struct Option *self, s32 arg) {
+    Cheats.WingCap = false;
+    Cheats.MetalCap = false;
+    Cheats.VanishCap = false;
+    Cheats.RemoveCap = false;
+    if (!arg) Cheats.NormalCap = true;
+}
+static void setJBC(UNUSED struct Option *self, s32 arg) {
+    if (!arg)
+        Cheats.JBC = true;
+}
+
+
+
 /* submenu option lists */
 
 #ifdef BETTERCAMERA
@@ -260,16 +294,24 @@ static struct Option optsControls[] = {
 };
 
 static struct Option optsVideo[] = {
+    #ifndef TARGET_SWITCH
     DEF_OPT_TOGGLE( optsVideoStr[0], &configWindow.fullscreen ),
     DEF_OPT_TOGGLE( optsVideoStr[5], &configWindow.vsync ),
+    #endif
     DEF_OPT_CHOICE( optsVideoStr[1], &configFiltering, filterChoices ),
     DEF_OPT_TOGGLE( optsVideoStr[7], &configHUD ),
+    #ifndef TARGET_SWITCH
     DEF_OPT_BUTTON( optsVideoStr[4], optvideo_reset_window ),
     DEF_OPT_BUTTON( optsVideoStr[9], optvideo_apply ),
+    #endif
 };
 
 static struct Option optsGame[] = {
-    DEF_OPT_CHOICE( optsGameStr[0], &configLanguage, NULL ),    
+    DEF_OPT_CHOICE( optsGameStr[0], &configLanguage, NULL ),
+    DEF_OPT_TOGGLE( optsGameStr[1], &configPrecacheRes ),
+    #ifdef TARGET_SWITCH
+    DEF_OPT_TOGGLE( optsGameStr[2], &configSwitchHud ),
+    #endif
 };
 
 static struct Option optsAudio[] = {
@@ -280,15 +322,45 @@ static struct Option optsAudio[] = {
 };
 
 static struct Option optsCheats[] = {
-    DEF_OPT_TOGGLE( optsCheatsStr[0], &Cheats.EnableCheats ),
-    DEF_OPT_TOGGLE( optsCheatsStr[1], &Cheats.MoonJump ),
-    DEF_OPT_TOGGLE( optsCheatsStr[2], &Cheats.GodMode ),
-    DEF_OPT_TOGGLE( optsCheatsStr[3], &Cheats.InfiniteLives ),
-    DEF_OPT_TOGGLE( optsCheatsStr[4], &Cheats.SuperSpeed ),
-    DEF_OPT_TOGGLE( optsCheatsStr[5], &Cheats.Responsive ),
-    DEF_OPT_TOGGLE( optsCheatsStr[6], &Cheats.ExitAnywhere ),
-    DEF_OPT_TOGGLE( optsCheatsStr[7], &Cheats.HugeMario ),
-    DEF_OPT_TOGGLE( optsCheatsStr[8], &Cheats.TinyMario ),
+    DEF_OPT_TOGGLE(optsCheatsStr[0], &Cheats.EnableCheats),
+    DEF_OPT_TOGGLE(optsCheatsStr[1], &Cheats.MoonJump),
+    DEF_OPT_TOGGLE(optsCheatsStr[2], &Cheats.GodMode),
+    DEF_OPT_TOGGLE(optsCheatsStr[3], &Cheats.InfiniteLives),
+    DEF_OPT_TOGGLE(optsCheatsStr[4], &Cheats.SuperSpeed),
+    DEF_OPT_TOGGLE(optsCheatsStr[5], &Cheats.Responsive),
+    DEF_OPT_TOGGLE(optsCheatsStr[6], &Cheats.ExitAnywhere),
+    DEF_OPT_TOGGLE(optsCheatsStr[7], &Cheats.HugeMario),
+    DEF_OPT_TOGGLE(optsCheatsStr[8], &Cheats.TinyMario),
+    DEF_OPT_CHOICE(optsCheatsStr2[0], &Cheats.Coin, CoinChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[1], &Cheats.Hover),
+    DEF_OPT_TOGGLE(optsCheatsStr2[2], &Cheats.Moon),
+    DEF_OPT_CHOICE(optsCheatsStr2[3], &Cheats.Run, SpeedChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[4], &Cheats.NDB),
+    DEF_OPT_TOGGLE(optsCheatsStr2[5], &Cheats.Jump),
+    DEF_OPT_TOGGLE(optsCheatsStr2[6], &Cheats.SPD),
+    DEF_OPT_TOGGLE(optsCheatsStr2[7], &Cheats.TPF),
+    DEF_OPT_CHOICE(optsCheatsStr2[8], &Cheats.JB, SeqChoices),
+    DEF_OPT_BUTTON(optsCheatsStr2[9], setJBC),
+    DEF_OPT_TOGGLE(optsCheatsStr2[10], &Cheats.QuikEnd),
+    DEF_OPT_CHOICE(optsCheatsStr2[11], &Cheats.Hurt, HurtCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[12], &Cheats.Cann),
+    DEF_OPT_TOGGLE(optsCheatsStr2[13], &Cheats.AutoWK),
+    DEF_OPT_TOGGLE(optsCheatsStr2[14], &Cheats.GetShell),
+    DEF_OPT_TOGGLE(optsCheatsStr2[15], &Cheats.GetBob),
+    DEF_OPT_CHOICE(optsCheatsStr2[16], &Cheats.Spamba, SpamCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[17], &Cheats.Swim),
+    DEF_OPT_BUTTON(optsCheatsStr2[18], setCap_Wing),
+    DEF_OPT_BUTTON(optsCheatsStr2[19], setCap_Metal),
+    DEF_OPT_BUTTON(optsCheatsStr2[20], setCap_Vanish),
+    DEF_OPT_BUTTON(optsCheatsStr2[21], setCap_Remove),
+    DEF_OPT_BUTTON(optsCheatsStr2[22], setCap_Normal),
+    DEF_OPT_CHOICE(optsCheatsStr2[23], &Cheats.BLJAnywhere, bljCheatChoices),
+    DEF_OPT_CHOICE(optsCheatsStr2[24], &Cheats.PAC, PlayAsCheatChoices),
+    DEF_OPT_TOGGLE(optsCheatsStr2[25], &Cheats.Triple),
+    DEF_OPT_TOGGLE(optsCheatsStr2[26], &Cheats.Fly),
+    DEF_OPT_TOGGLE(optsCheatsStr2[27], &Cheats.NoBounds),
+    DEF_OPT_TOGGLE(optsCheatsStr2[28], &Cheats.FLJ),
+    DEF_OPT_TOGGLE(optsCheatsStr2[29], &Cheats.TimeStop),
 
 };
 
@@ -375,6 +447,11 @@ static void optmenu_draw_opt(const struct Option *opt, s16 x, s16 y, u8 sel) {
         y -= 6;
 
     optmenu_draw_text(x, y, get_key_string(opt->label), sel);
+	
+    s16 sx = 0;
+    s16 sy = 0;
+    s16 sw = 0;
+    s16 sh = 0;
 
     switch (opt->type) {
         case OPT_TOGGLE:
@@ -393,8 +470,13 @@ static void optmenu_draw_opt(const struct Option *opt, s16 x, s16 y, u8 sel) {
             break;
 
         case OPT_SCROLL:
-            int_to_str(*opt->uval, buf);
-            optmenu_draw_text(x, y-13, buf, sel);
+            sx = x - 127 / 2;
+            sy = 209 - (y - 35);            
+            sw = sx + (127.0 * (((*opt->uval * 1.0) + __FLT_MIN__) / (opt->scrMax * 1.0)));
+            sh = sy + 7;
+
+            render_hud_rectangle(sx - 1, sy - 1, (sx + 126), sh + 1, 180, 180, 180);
+            render_hud_rectangle(sx, sy, sw - 2, sh, 255, 255, 255);
             break;
 
         case OPT_BIND:
@@ -498,10 +580,10 @@ void optmenu_draw(void) {
     gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gSPDisplayList(gDisplayListHead++, dl_ia_text_end);
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, 255);
-    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
-    print_hud_lut_string(HUD_LUT_GLOBAL, 80, 90 + (32 * (currentMenu->select - currentMenu->scroll)), get_key_string(menuStr[0]));
-    print_hud_lut_string(HUD_LUT_GLOBAL, 224, 90 + (32 * (currentMenu->select - currentMenu->scroll)), get_key_string(menuStr[0]));
-    gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
+    // gSPDisplayList(gDisplayListHead++, dl_rgba16_text_begin);
+    // print_hud_lut_string(HUD_LUT_GLOBAL, 80, 90 + (32 * (currentMenu->select - currentMenu->scroll)), get_key_string(menuStr[0]));
+    // print_hud_lut_string(HUD_LUT_GLOBAL, 224, 90 + (32 * (currentMenu->select - currentMenu->scroll)), get_key_string(menuStr[0]));
+    // gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 }
 
 //This has been separated for interesting reasons. Don't question it.
@@ -650,5 +732,5 @@ void optmenu_check_buttons(void) {
         optmenu_option_timer = 0;
     }
 }
-
+#endif
 #endif // EXT_OPTIONS_MENU

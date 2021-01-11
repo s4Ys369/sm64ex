@@ -703,3 +703,36 @@ u32 save_file_get_cannon_flags(s32 fileIndex, s32 courseIndex) {
 
     return 0;
 }
+
+s32 save_file_taken_key(s32 fileIndex, s32 keyId){
+    return gSaveBuffer.files[fileIndex][0].courseKeys[keyId];
+}
+
+void save_file_register_key(s32 fileIndex, s32 keyId) {
+    gSaveBuffer.files[fileIndex][0].courseKeys[keyId] = TRUE;
+
+    gSaveFileModified = TRUE;
+    save_file_do_save(fileIndex);
+}
+
+s32 save_file_get_keys(s32 fileIndex) {
+    s32 keyAmount = 0;
+
+    for(s32 tmp = 0; tmp < 10; tmp++){
+        if(gSaveBuffer.files[fileIndex][0].courseKeys[tmp]) keyAmount++;
+    }
+
+    return keyAmount;
+}
+
+void save_file_update_player_model(s32 fileIndex, s32 character){
+    gSaveBuffer.files[fileIndex][0].currentPlayerModel = character;
+
+    gSaveFileModified = TRUE;
+    save_file_do_save(fileIndex);
+}
+
+s32 save_file_get_player_model(s32 fileIndex){
+    s32 current = gSaveBuffer.files[fileIndex][0].currentPlayerModel;
+    return (current < 0 || current > 1) ? 0 : current;
+}

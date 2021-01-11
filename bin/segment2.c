@@ -112,7 +112,7 @@ ALIGNED8 static const u8 texture_hud_char_multiply[] = "textures/segment2/segmen
 
 ALIGNED8 static const u8 texture_hud_char_coin[] = "textures/segment2/segment2.05800.rgba16";
 
-ALIGNED8 static const u8 texture_hud_char_mario_head[] = "textures/segment2/segment2.05A00.rgba16";
+ALIGNED8 static const u8 texture_hud_char_mario_head[] = "textures/segment2/mario_head_normal.rgba16";
 
 ALIGNED8 static const u8 texture_hud_char_star[] = "textures/segment2/segment2.05C00.rgba16";
 
