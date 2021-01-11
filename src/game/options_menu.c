@@ -507,7 +507,7 @@ static void optmenu_opt_change(struct Option *opt, s32 val) {
             break;
 
         case OPT_CHOICE:
-            *opt->uval = wrap_add(*opt->uval, val, 0, strcmp(opt->label, optsGameStr[0]) == 0 ? languagesAmount - 1: opt->numChoices - 1);
+            *opt->uval = wrap_add(*opt->uval, val, 0, strcmp(opt->label, optsGameStr[0]) == 0 ? get_num_languages() - 1: opt->numChoices - 1);
             set_language(languages[configLanguage]);
             break;
 

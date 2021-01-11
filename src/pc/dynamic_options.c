@@ -968,7 +968,7 @@ static const unsigned char *r96lang(struct DynosOption *opt) {
     unsigned char *s = getTranslatedText(languages[*opt->choice.pindex]->name);
     memcpy(buffer, s, str64l(s) + 1);
     free(s);
-    opt->choice.count = languagesAmount;
+    opt->choice.count = get_num_languages();
     return str64d(buffer);
 }
 
