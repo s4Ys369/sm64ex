@@ -66,6 +66,10 @@
 #include "sgi/utils/characters.h"
 #endif // R96
 
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 
 #define SwiftSwim 42.0f
 

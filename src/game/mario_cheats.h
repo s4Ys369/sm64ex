@@ -18,7 +18,7 @@ void cheats_long_jump(struct MarioState *m);
 void cheats_mario_inputs(struct MarioState *m);
 
 /* Options */
-#define TIME_BUTTON 0x0080
+#define TIME_BUTTON 0x0400
 
 #include "pc/dynamic_options.h"
 #define __chaos_mode__   dynos_get_value("chaos_mode")
