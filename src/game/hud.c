@@ -121,7 +121,7 @@ void render_hud_small_tex_lut(s32 x, s32 y, u8 *texture) {
 }
 
 void render_hud_texture(s32 x, s32 y, u32 w, u32 h, u8 *texture) {
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);    
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_32b, 0, 0, G_TX_LOADTILE, 0, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOMIRROR, G_TX_NOMASK, G_TX_NOLOD);
     gDPTileSync(gDisplayListHead++);
     gDPSetTile(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_32b, 2, 0, G_TX_RENDERTILE, 0, G_TX_NOMIRROR, 3, G_TX_NOLOD, G_TX_NOMIRROR, 3, G_TX_NOLOD);
@@ -340,62 +340,62 @@ void render_hud_mario_lives(void) {
     if(isLuigi() && is_metal_cap(gMarioState) && is_vanish_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_metal_invis.rgba32"); // 'Luigi metal vanish Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(isLuigi() && is_metal_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_metal.rgba32"); // 'Luigi metal Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(isLuigi() && is_vanish_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_invis.rgba32"); // 'Luigi vanish Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(isLuigi() && is_wing_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_wings.rgba32"); // 'Luigi wing Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(isLuigi() && is_hatless(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_capless.rgba32"); // 'Luigi hatless Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(isLuigi()){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/luigi_normal.rgba32"); // 'Luigi Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(!isLuigi() && is_metal_cap(gMarioState) && is_vanish_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_metal_invis.rgba32"); // 'mario metal vanish Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(!isLuigi() && is_metal_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_metal.rgba32"); // 'mario metal Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(!isLuigi() && is_vanish_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_invis.rgba32"); // 'mario vanish Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(!isLuigi() && is_wing_cap(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_wings.rgba32"); // 'mario wing Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else if(!isLuigi() && is_hatless(gMarioState)){
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_capless.rgba32"); // 'mario hatless Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
     }
     else{
         gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
         render_hud_tex_lut(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), 15, "textures/segment2/mario_normal.rgba32"); // 'Mario Head' glyph
-        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+        gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
         //print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(22), HUD_TOP_Y, ","); // 'Mario Head' glyph
     }
     print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(38), HUD_TOP_Y, "*"); // 'X' glyph
@@ -464,7 +464,7 @@ void render_hud_keys(void) {
         gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
         print_text(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(38), HUD_TOP_Y - 20, "*"); // 'X' glyph
         print_text_fmt_int(GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(54), HUD_TOP_Y - 20, "%d", gHudDisplay.keys);
-    }    
+    }
 }
 
 s8 renderNotification = FALSE;
@@ -491,9 +491,9 @@ void render_notification(){
 
         if(!currentSwitch){
             if(slideTimer < 100){
-                if(slideTimer < 15) slideY += 2;                
+                if(slideTimer < 15) slideY += 2;
                 slideTimer++;
-            }else{            
+            }else{
                 currentSwitch = TRUE;
             }
         }else{
@@ -501,15 +501,15 @@ void render_notification(){
                 if(slideTimer > 85) slideY -= 2;
                 else renderNotification = FALSE;
                 slideTimer--;
-            }else {            
+            }else {
                 currentSwitch = FALSE;
             }
-        }    
+        }
 
         u32 baseWidth = 845;
         u32 baseHeight = 109;
 
-        f32 newWidth = 16 * baseWidth / baseHeight;    
+        f32 newWidth = 16 * baseWidth / baseHeight;
 
         render_hud_texture((SCREEN_WIDTH / 2) - (newWidth / 2), -28 + slideY, newWidth, 16, current);
     }
@@ -580,7 +580,8 @@ void render_hud_camera_status(void) {
     if (sCameraHUD.status == CAM_STATUS_NONE) {
         return;
     }
-
+    #ifdef BETTERCAMERA
+    if (configEnableCamera == false) {
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
 
@@ -609,6 +610,37 @@ void render_hud_camera_status(void) {
             render_hud_small_tex_lut(x + 4, y - 8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
             break;
     }
+  }
+    #else
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
+    render_hud_tex_lut(x, y, (*cameraLUT)[GLYPH_CAM_CAMERA]);
+
+    switch (sCameraHUD.status & CAM_STATUS_MODE_GROUP) {
+        case CAM_STATUS_MARIO:
+            if(isLuigi()){
+                render_hud_tex_lut(x + 16, y, "textures/segment2/luigi_normal.rgba32");
+            }
+            else{
+                render_hud_tex_lut(x + 16, y, "textures/segment2/mario_normal.rgba32");
+            }
+            break;
+        case CAM_STATUS_LAKITU:
+            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_LAKITU_HEAD]);
+            break;
+        case CAM_STATUS_FIXED:
+            render_hud_tex_lut(x + 16, y, (*cameraLUT)[GLYPH_CAM_FIXED]);
+            break;
+    }
+
+    switch (sCameraHUD.status & CAM_STATUS_C_MODE_GROUP) {
+        case CAM_STATUS_C_DOWN:
+            render_hud_small_tex_lut(x + 4, y + 16, (*cameraLUT)[GLYPH_CAM_ARROW_DOWN]);
+            break;
+        case CAM_STATUS_C_UP:
+            render_hud_small_tex_lut(x + 4, y - 8, (*cameraLUT)[GLYPH_CAM_ARROW_UP]);
+            break;
+    }
+  #endif
 
     gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 }
@@ -626,7 +658,7 @@ void render_nx_hud(void){
     render_hud_rectangle(x, y, x + (s16)(14 * getBatteryPercentage()), h, 76, 235, 52);
 
     x = GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(20);
-    y = 207;    
+    y = 207;
 
     struct NXController controller;
 
@@ -634,7 +666,7 @@ void render_nx_hud(void){
 
     gSPDisplayList(gDisplayListHead++, dl_hud_img_begin);
     render_hud_tex_lut(x, y, controller.icon);
-    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);    
+    gSPDisplayList(gDisplayListHead++, dl_hud_img_end);
 
 }
 #endif
@@ -680,9 +712,9 @@ void render_hud(void) {
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_LIVES && configHUD) {
             render_hud_mario_lives();
         }
-		
+
 		render_hud_keys();
-		
+
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_COIN_COUNT && configHUD) {
             render_hud_coins();
         }
@@ -699,14 +731,14 @@ void render_hud(void) {
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_TIMER && configHUD) {
             render_hud_timer();
         }
-    
+
         if( configHUD ) {
 
         #ifdef TARGET_SWITCH
             if ( configSwitchHud )
                 render_nx_hud();
         #endif
-        
+
         }
 
         render_notification();
