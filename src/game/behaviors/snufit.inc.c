@@ -1,3 +1,5 @@
+#include "pc/configfile.h"
+
 /**
  * Behavior file for bhvSnufit and bhvSnufitBalls.
  * Snufits are present in HMC and CotMC, and are the fly guy

@@ -3366,6 +3366,7 @@
         "TEXT_OPT_SFXVOLUME": "Volumen de los Efectos",
         "TEXT_OPT_ENVVOLUME": "Volumen del Ambiente",
         "TEXT_OPT_VSYNC": "Sync Vertical",
+        "TEXT_OPT_DRAWDIST": "Draw Distance",  
         "TEXT_OPT_AUTO": "Auto",
         "TEXT_OPT_HUD": "HUD",
         "TEXT_OPT_THREEPT": "Tres-puntos",

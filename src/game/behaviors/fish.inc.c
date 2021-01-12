@@ -1,3 +1,5 @@
+#include "pc/configfile.h"
+
 /**
  * @file fish.inc.c
  * Implements behaviour and spawning for fish located in the Secret Aquarium and other levels.
@@ -42,9 +44,7 @@ void fish_act_spawn(void) {
      * If the current level is Secret Aquarium, ignore this requirement.
      * Fish moves at random with a max-range of 700.0f.
      */
-#ifndef NODRAWINGDISTANCE
-    if (o->oDistanceToMario < minDistToMario || gCurrLevelNum == LEVEL_SA) {
-#endif
+    if (o->oDistanceToMario < minDistToMario * configDrawDistance / 100 || gCurrLevelNum == LEVEL_SA) {
         for (i = 0; i < schoolQuantity; i++) {
             fishObject = spawn_object(o, model, bhvFish);
             fishObject->oBehParams2ndByte = o->oBehParams2ndByte;
@@ -52,9 +52,7 @@ void fish_act_spawn(void) {
             obj_translate_xyz_random(fishObject, 700.0f);
         }
         o->oAction = FISH_ACT_ACTIVE;
-#ifndef NODRAWINGDISTANCE
     }
-#endif
 }
 
 /**
@@ -62,13 +60,11 @@ void fish_act_spawn(void) {
  * Y coordinate is greater than 2000.0f then spawn another fish.
  */
 void fish_act_respawn(void) {
-#ifndef NODRAWINGDISTANCE
     if (gCurrLevelNum != LEVEL_SA) {
-        if (gMarioObject->oPosY - o->oPosY > 2000.0f) {
+        if (gMarioObject->oPosY - o->oPosY > 20 * configDrawDistance) {
             o->oAction = FISH_ACT_RESPAWN;
         }
     }
-#endif
 }
 
 /**
