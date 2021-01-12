@@ -79,7 +79,6 @@ static const u8 optsCameraStr[][32] = {
 // This is only for testing
 
 static const u8 optsGameStr[][32] = {
-    "TEXT_OPT_LANGUAGE"
     "TEXT_OPT_LANGUAGE",
     "TEXT_OPT_PRECACHE",
     "TEXT_OPT_SWITCH_HUD"
