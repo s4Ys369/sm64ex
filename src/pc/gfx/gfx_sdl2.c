@@ -151,8 +151,12 @@ int test_vsync(void) {
 
 static inline void gfx_sdl_set_vsync(const bool enabled) {
 #ifdef TARGET_SWITCH
-    SDL_GL_SetSwapInterval(2);
     use_timer = false;
+    #ifdef HIGHFPS
+        SDL_GL_SetSwapInterval(1);
+    #else
+        SDL_GL_SetSwapInterval(2);
+    #endif
 #else
     if (enabled) {
         // try to detect refresh rate
