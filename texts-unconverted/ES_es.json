@@ -3499,6 +3499,7 @@
         "TEXT_OPT_SFXVOLUME": "Volumen de los efectos de sonido",
         "TEXT_OPT_ENVVOLUME": "Volumen del entorno",
         "TEXT_OPT_VSYNC": "Sincronización vertical",
+        "TEXT_OPT_DRAWDIST": "Draw Distance",
         "TEXT_OPT_DOUBLE": "Doble",
         "TEXT_OPT_HUD": "Interfaz",
         "TEXT_OPT_THREEPT": "Triple",

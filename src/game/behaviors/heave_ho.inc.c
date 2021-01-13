@@ -1,3 +1,5 @@
+#include "pc/configfile.h"
+
 // heave_ho.c.inc
 
 s16 D_8032F460[][2] = { { 30, 0 }, { 42, 1 }, { 52, 0 },  { 64, 1 },  { 74, 0 },
@@ -72,11 +74,8 @@ void heave_ho_act_3(void) {
 }
 
 void heave_ho_act_0(void) {
-#ifndef NODRAWINGDISTANCE
-    if (find_water_level(o->oPosX, o->oPosZ) < o->oPosY && o->oDistanceToMario < 4000.0f) {
-#else
-    if (find_water_level(o->oPosX, o->oPosZ) < (o->oPosY - 50.0f)) {
-#endif
+    if (find_water_level(o->oPosX, o->oPosZ) < o->oPosY && o->oDistanceToMario < 40 * configDrawDistance) {
+    //if (find_water_level(o->oPosX, o->oPosZ) < (o->oPosY - 50.0f)) {
         cur_obj_set_pos_to_home();
         cur_obj_become_tangible();
         cur_obj_unhide();

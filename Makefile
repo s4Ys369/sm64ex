@@ -37,8 +37,6 @@ TARGET_BITS ?= 0
 
 # Disable better camera by default
 BETTERCAMERA ?= 0
-# Disable no drawing distance by default
-NODRAWINGDISTANCE ?= 0
 # Disable 60 fps by default
 HIGHFPS ?= 0
 # Disable HD Model code (Like billboard removal) by default
@@ -516,12 +514,6 @@ ifeq ($(BETTERCAMERA),1)
   CC_CHECK += -DBETTERCAMERA
   CFLAGS += -DBETTERCAMERA
   EXT_OPTIONS_MENU := 1
-endif
-
-# Check for no drawing distance option
-ifeq ($(NODRAWINGDISTANCE),1)
-  CC_CHECK += -DNODRAWINGDISTANCE
-  CFLAGS += -DNODRAWINGDISTANCE
 endif
 
 # Check for 60 fps option
