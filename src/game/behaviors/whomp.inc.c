@@ -1,3 +1,5 @@
+#include "pc/configfile.h"
+
 // whomp.c.inc
 
 void whomp_play_sfx_from_pound_animation(void) {
@@ -246,14 +248,12 @@ void bhv_whomp_loop(void) {
     cur_obj_call_action_function(sWhompActions);
     cur_obj_move_standard(-20);
     if (o->oAction != 9) {
-#ifndef NODRAWINGDISTANCE
         // o->oBehParams2ndByte here seems to be a flag
         // indicating whether this is a normal or king whomp
         if (o->oBehParams2ndByte != 0)
-            cur_obj_hide_if_mario_far_away_y(2000.0f);
+            cur_obj_hide_if_mario_far_away_y(20 * configDrawDistance);
         else
-            cur_obj_hide_if_mario_far_away_y(1000.0f);
-#endif
+            cur_obj_hide_if_mario_far_away_y(10 * configDrawDistance);
         load_object_collision_model();
     }
 }

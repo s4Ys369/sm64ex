@@ -37,8 +37,6 @@ TARGET_BITS ?= 0
 
 # Disable better camera by default
 BETTERCAMERA ?= 0
-# Disable no drawing distance by default
-NODRAWINGDISTANCE ?= 0
 # Disable 60 fps by default
 HIGHFPS ?= 0
 # Disable HD Model code (Like billboard removal) by default
@@ -518,12 +516,6 @@ ifeq ($(BETTERCAMERA),1)
   EXT_OPTIONS_MENU := 1
 endif
 
-# Check for no drawing distance option
-ifeq ($(NODRAWINGDISTANCE),1)
-  CC_CHECK += -DNODRAWINGDISTANCE
-  CFLAGS += -DNODRAWINGDISTANCE
-endif
-
 # Check for 60 fps option
 ifeq ($(MODELPACK),1)
   CC_CHECK += -DMODELPACK
@@ -794,7 +786,7 @@ $(BUILD_DIR)/%.o: %.s
 	$(AS) $(ASFLAGS) -MD $(BUILD_DIR)/$*.d -o $@ $<
 
 $(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(BUILD_DIR)/$(RPC_LIBS)
-	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS)
+	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS) -lstdc++
 
 ifeq ($(TARGET_SWITCH), 1)
 

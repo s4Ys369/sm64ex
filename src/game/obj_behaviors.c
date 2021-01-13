@@ -27,6 +27,7 @@
 #include "obj_behaviors.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
+#include "pc/configfile.h"
 #include "rendering_graph_node.h"
 #include "save_file.h"
 #include "spawn_object.h"
@@ -530,15 +531,11 @@ void set_object_visibility(struct Object *obj, s32 dist) {
     f32 objY = obj->oPosY;
     f32 objZ = obj->oPosZ;
 
-#ifndef NODRAWINGDISTANCE
-    if (is_point_within_radius_of_mario(objX, objY, objZ, dist) == TRUE) {
-#endif
+    if (is_point_within_radius_of_mario(objX, objY, objZ, dist * configDrawDistance / 100) == TRUE) {
         obj->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-#ifndef NODRAWINGDISTANCE
     } else {
         obj->header.gfx.node.flags |= GRAPH_RENDER_INVISIBLE;
     }
-#endif
 }
 
 /**

@@ -79,7 +79,6 @@ static const u8 optsCameraStr[][32] = {
 // This is only for testing
 
 static const u8 optsGameStr[][32] = {
-    "TEXT_OPT_LANGUAGE"
     "TEXT_OPT_LANGUAGE",
     "TEXT_OPT_PRECACHE",
     "TEXT_OPT_SWITCH_HUD"
@@ -95,6 +94,7 @@ static const u8 optsVideoStr[][32] = {
     "TEXT_OPT_AUTO",
     "TEXT_OPT_HUD",
     "TEXT_OPT_THREEPT",
+    "TEXT_OPT_DRAWDIST",
     "TEXT_OPT_APPLY"
 };
 
@@ -299,10 +299,11 @@ static struct Option optsVideo[] = {
     DEF_OPT_TOGGLE( optsVideoStr[5], &configWindow.vsync ),
     #endif
     DEF_OPT_CHOICE( optsVideoStr[1], &configFiltering, filterChoices ),
+    DEF_OPT_SCROLL( optsVideoStr[9], &configDrawDistance, 50, 509, 10 ),
     DEF_OPT_TOGGLE( optsVideoStr[7], &configHUD ),
     #ifndef TARGET_SWITCH
     DEF_OPT_BUTTON( optsVideoStr[4], optvideo_reset_window ),
-    DEF_OPT_BUTTON( optsVideoStr[9], optvideo_apply ),
+    DEF_OPT_BUTTON( optsVideoStr[10], optvideo_apply ),
     #endif
 };
 
@@ -507,7 +508,7 @@ static void optmenu_opt_change(struct Option *opt, s32 val) {
             break;
 
         case OPT_CHOICE:
-            *opt->uval = wrap_add(*opt->uval, val, 0, strcmp(opt->label, optsGameStr[0]) == 0 ? languagesAmount - 1: opt->numChoices - 1);
+            *opt->uval = wrap_add(*opt->uval, val, 0, strcmp(opt->label, optsGameStr[0]) == 0 ? get_num_languages() - 1: opt->numChoices - 1);
             set_language(languages[configLanguage]);
             break;
 

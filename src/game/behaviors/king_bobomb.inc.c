@@ -1,3 +1,5 @@
+#include "pc/configfile.h"
+
 // king_bobomb.c.inc
 
 // Copy of geo_update_projectile_pos_from_parent
@@ -295,14 +297,10 @@ void king_bobomb_move(void) {
         cur_obj_move_using_fvel_and_gravity();
     cur_obj_call_action_function(sKingBobombActions);
     exec_anim_sound_state(sKingBobombSoundStates);
-#ifndef NODRAWINGDISTANCE
-    if (o->oDistanceToMario < 5000.0f)
-#endif
+    if (o->oDistanceToMario < 50 * configDrawDistance)
         cur_obj_enable_rendering();
-#ifndef NODRAWINGDISTANCE
     else
         cur_obj_disable_rendering();
-#endif
 }
 
 void bhv_king_bobomb_loop(void) {

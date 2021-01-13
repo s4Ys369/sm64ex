@@ -3357,6 +3357,7 @@
         "TEXT_OPT_SFXVOLUME": "Efekty dzwiekowe",
         "TEXT_OPT_ENVVOLUME": "Otoczenie",
         "TEXT_OPT_VSYNC": "Vertical Sync",
+        "TEXT_OPT_DRAWDIST": "Draw Distance",
         "TEXT_OPT_AUTO": "Auto",
         "TEXT_OPT_HUD": "HUD",
         "TEXT_OPT_THREEPT": "Three-point",

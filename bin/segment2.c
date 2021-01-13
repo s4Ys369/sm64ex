@@ -912,6 +912,11 @@ ALIGNED8 static const u8 texture_font_char_mayus_accent_i [] = "textures/special
 ALIGNED8 static const u8 texture_font_char_mayus_accent_o [] = "textures/special/mayus_accent_o";
 ALIGNED8 static const u8 texture_font_char_mayus_accent_u [] = "textures/special/mayus_accent_u";
 ALIGNED8 static const u8 texture_font_char_mayus_umlaut   [] = "textures/special/mayus_umlaut";
+ALIGNED8 static const u8 texture_font_char_sz   		  [] = "textures/special/sz";
+ALIGNED8 static const u8 texture_font_char_ae_lowercase   [] = "textures/special/ae_lowercase";
+ALIGNED8 static const u8 texture_font_char_ae_uppercase   [] = "textures/special/ae_uppercase";
+ALIGNED8 static const u8 texture_font_char_oe_lowercase   [] = "textures/special/oe_lowercase";
+ALIGNED8 static const u8 texture_font_char_oe_uppercase   [] = "textures/special/oe_uppercase";
 ALIGNED8 static const u8 texture_font_char_exclamation    [] = "textures/special/exclamation";
 ALIGNED8 static const u8 texture_font_char_mayus_enye     [] = "textures/special/mayus_enye";
 ALIGNED8 static const u8 texture_font_char_accent_a       [] = "textures/special/accent_a";
@@ -928,6 +933,9 @@ ALIGNED8 static const u8 texture_hud_char_Q             [] = "textures/special/h
 ALIGNED8 static const u8 texture_hud_char_V             [] = "textures/special/hud_v";
 ALIGNED8 static const u8 texture_hud_char_X             [] = "textures/special/hud_x";
 ALIGNED8 static const u8 texture_hud_char_Z             [] = "textures/special/hud_z";
+ALIGNED8 static const u8 texture_hud_char_AE_uppercase  [] = "textures/special/hud_ae_uppercase";
+ALIGNED8 static const u8 texture_hud_char_OE_uppercase  [] = "textures/special/hud_oe_uppercase";
+ALIGNED8 static const u8 texture_hud_char_UE_uppercase  [] = "textures/special/hud_ue_uppercase";
 ALIGNED8 static const u8 texture_hud_char_decimal_point [] = "textures/special/hud_decimal";
 
 ALIGNED8 static const u8 texture_hud_char_camera[] = "textures/segment2/segment2.07B50.rgba16";
@@ -985,8 +993,8 @@ const u8 *const main_font_lut[] = {
     texture_font_char_us_button_A, texture_font_char_us_button_B, texture_font_char_us_button_C, texture_font_char_us_button_Z,
     texture_font_char_us_button_R,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
+                  0x0,               0x0, texture_font_char_ae_lowercase,               0x0,
+                  0x0,               0x0,               texture_font_char_ae_uppercase,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0, texture_font_char_us_comma,
     // SPECIAL CHARS: Start ID - 112:0x70
@@ -994,12 +1002,12 @@ const u8 *const main_font_lut[] = {
     texture_font_char_accent_u, texture_font_char_mayus_accent_a, texture_font_char_mayus_accent_e, texture_font_char_mayus_accent_i, 
     texture_font_char_mayus_accent_o, texture_font_char_mayus_accent_u, texture_font_char_enye, texture_font_char_mayus_enye,
     texture_font_char_umlaut, texture_font_char_mayus_umlaut, texture_font_char_question, texture_font_char_exclamation, 
+				  0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
+                  0x0,               0x0, texture_font_char_oe_lowercase,               0x0,
+                  0x0,               0x0, texture_font_char_oe_uppercase,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0, texture_font_char_us_slash,
                   0x0,               0x0,               0x0,               0x0,
@@ -1008,7 +1016,7 @@ const u8 *const main_font_lut[] = {
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
+                  0x0,               0x0,               0x0,       		   0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
                   0x0,               0x0,               0x0,               0x0,
@@ -1021,7 +1029,7 @@ const u8 *const main_font_lut[] = {
                   0x0, texture_font_char_us_open_parentheses, texture_font_char_us_close_open_parentheses, texture_font_char_us_close_parentheses,
     texture_font_char_us_left_right_arrow, texture_font_char_us_ampersand, texture_font_char_us_ellipsis,               0x0,
                   0x0,               0x0,               0x0,               0x0,
-                  0x0,               0x0,               0x0,               0x0,
+    texture_font_char_sz,               0x0,               0x0,               0x0,
                   0x0,               0x0, texture_font_char_us_exclamation, texture_font_char_us_percent,
     texture_font_char_us_question, texture_font_char_us_double_quote_open, texture_font_char_us_double_quote_close, texture_font_char_us_tilde,
                   0x0, texture_font_char_us_coin, texture_font_char_us_star_filled, texture_font_char_us_multiply,
