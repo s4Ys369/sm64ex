@@ -791,5 +791,6 @@ struct GraphNode *process_geo_layout(struct AllocOnlyPool *pool, void *segptr) {
         GeoLayoutJumpTable[gGeoLayoutCommand[0x00]]();
     }
 
+    gCurRootGraphNode->georef = segmented_to_virtual(segptr);
     return gCurRootGraphNode;
 }

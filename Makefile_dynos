@@ -3,22 +3,31 @@
 # ----------------------
 
 DYNOS_INPUT_DIR := ./dynos
-DYNOS_OUTPUT_DIR := $(BUILD_DIR)/$(BASEDIR)
-DYNOS_COPY_TO_RES := \
+DYNOS_OUTPUT_DIR := $(BUILD_DIR)/dynos
+DYNOS_PACKS_DIR := $(BUILD_DIR)/dynos/packs
+DYNOS_INIT := \
     mkdir -p $(DYNOS_INPUT_DIR); \
     mkdir -p $(DYNOS_OUTPUT_DIR); \
-    for f in $(DYNOS_INPUT_DIR)/*.txt; do \
-        [ -f "$$f" ] || continue; \
-        cp -f $$f $(DYNOS_OUTPUT_DIR)/$$(basename -- $$f); \
-    done;
+    mkdir -p $(DYNOS_PACKS_DIR); \
+    cp -f -r $(DYNOS_INPUT_DIR) $(BUILD_DIR) 2>/dev/null || true ;
 
-DYNOS := $(shell $(call DYNOS_COPY_TO_RES))
-
+DYNOS_DO := $(shell $(call DYNOS_INIT))
 INCLUDE_CFLAGS += -DDYNOS
 
-# Render96 v2.0 detection flag
+# ---------------
+# Render96 v1.4.2
+# ---------------
+
+ifeq ($(findstring src/sgi/utils,$(SRC_DIRS)),src/sgi/utils)
+INCLUDE_CFLAGS += -DRENDER96
+endif
+
+# ---------------
+# Render96 v2.1.a
+# ---------------
+
 ifeq ($(findstring src/text/libs,$(SRC_DIRS)),src/text/libs)
-INCLUDE_CFLAGS += -DRENDER96_2_0
+INCLUDE_CFLAGS += -DRENDER96_2
 else
-$(BUILD_DIR)/src/pc/dynamic_options.o: $(BUILD_DIR)/include/text_strings.h
+$(BUILD_DIR)/data/dynos_opt_vanilla_c.o: $(BUILD_DIR)/include/text_strings.h
 endif

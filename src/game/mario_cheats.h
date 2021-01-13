@@ -20,17 +20,17 @@ void cheats_mario_inputs(struct MarioState *m);
 /* Options */
 #define TIME_BUTTON 0x0400
 
-#include "pc/dynamic_options.h"
-#define __chaos_mode__   dynos_get_value("chaos_mode")
-#define __time_button__ dynos_get_value("time_button")
-#define __spl__ dynos_get_value("spl")
-#define __no_heavy__ dynos_get_value("no_heavy")
-#define __haz_walk__ dynos_get_value("haz_walk")
-#define __swim_any__ dynos_get_value("swim_any")
-#define __coin_mag__ dynos_get_value("coin_mag")
-#define __jump_man__ dynos_get_value("jump_man")
-#define __wat_con__ dynos_get_value("wat_con")
-#define __wat_lev__ dynos_get_value("wat_lev")
+#include "data/dynos.c.h"
+#define __chaos_mode__   dynos_opt_get_value("chaos_mode")
+#define __time_button__ dynos_opt_get_value("time_button")
+#define __spl__ dynos_opt_get_value("spl")
+#define __no_heavy__ dynos_opt_get_value("no_heavy")
+#define __haz_walk__ dynos_opt_get_value("haz_walk")
+#define __swim_any__ dynos_opt_get_value("swim_any")
+#define __coin_mag__ dynos_opt_get_value("coin_mag")
+#define __jump_man__ dynos_opt_get_value("jump_man")
+#define __wat_con__ dynos_opt_get_value("wat_con")
+#define __wat_lev__ dynos_opt_get_value("wat_lev")
 #define CHAOS_MODE (__chaos_mode__ == 1)
 #define SPL (__spl__)
 #define NO_HEAVY (__no_heavy__ == 1)

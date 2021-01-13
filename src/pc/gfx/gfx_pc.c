@@ -415,6 +415,11 @@ static void import_texture(int tile) {
         return;
     }
 
+    extern int dynos_gfx_import_texture(void **, void *, int, void *, void **, void *, int *, int);
+    if (dynos_gfx_import_texture((void **) &rendering_state.textures[tile], (void *) rdp.loaded_texture[tile].addr, tile, gfx_rapi, (void **) gfx_texture_cache.hashmap, (void *) gfx_texture_cache.pool, (int *) &gfx_texture_cache.pool_pos, MAX_CACHED_TEXTURES)) {
+        return;
+    }
+
     if (gfx_texture_cache_lookup(tile, &rendering_state.textures[tile], rdp.loaded_texture[tile].addr, fmt, siz)) {
         return;
     }
