@@ -51,52 +51,52 @@ Lights1 luigi_shoe_lights = gdSPDefLights1(
 	0xFE, 0xFE, 0xFE, 0x28, 0x28, 0x28);
 
 Gfx luigi_button_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_button_rgba16[] = "actors/luigi/button.rgba16";
+ALIGNED8 static const u8 luigi_button_rgba16[] = "actors/luigi/button.rgba16";
 
 Gfx luigi_mario_metal_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_mario_metal_rgba16[] = "actors/mario/mario_metal.rgba16";
+ALIGNED8 static const u8 luigi_mario_metal_rgba16[] = "actors/mario/mario_metal.rgba16";
 
 Gfx luigi_logo_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_logo_rgba16[] = "actors/luigi/logo.rgba16";
+ALIGNED8 static const u8 luigi_logo_rgba16[] = "actors/luigi/logo.rgba16";
 
 Gfx luigi_sideburn_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_sideburn_rgba16[] = "actors/luigi/sideburn.rgba16";
+ALIGNED8 static const u8 luigi_sideburn_rgba16[] = "actors/luigi/sideburn.rgba16";
 
 Gfx luigi_eye_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_eye_rgba16[] = "actors/luigi/eye.rgba16";
+ALIGNED8 static const u8 luigi_eye_rgba16[] = "actors/luigi/eye.rgba16";
 
 Gfx luigi_ear_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_ear_rgba16[] = "actors/luigi/ear.rgba16";
+ALIGNED8 static const u8 luigi_ear_rgba16[] = "actors/luigi/ear.rgba16";
 
 Gfx luigi_mustache_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_mustache_rgba16[] = "actors/luigi/mustache.rgba16";
+ALIGNED8 static const u8 luigi_mustache_rgba16[] = "actors/luigi/mustache.rgba16";
 
 Gfx luigi_eyehalf_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_eyehalf_rgba16[] = "actors/luigi/eyehalf.rgba16";
+ALIGNED8 static const u8 luigi_eyehalf_rgba16[] = "actors/luigi/eyehalf.rgba16";
 
 Gfx luigi_eyeclosed_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_eyeclosed_rgba16[] = "actors/luigi/eyeclosed.rgba16";
+ALIGNED8 static const u8 luigi_eyeclosed_rgba16[] = "actors/luigi/eyeclosed.rgba16";
 
 Gfx luigi_eyedead_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_eyedead_rgba16[] = "actors/luigi/eyedead.rgba16";
+ALIGNED8 static const u8 luigi_eyedead_rgba16[] = "actors/luigi/eyedead.rgba16";
 
 Gfx luigi_mario_wing_tip_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_mario_wing_tip_rgba16[] = "actors/mario/mario_wing_tip.rgba16";
+ALIGNED8 static const u8 luigi_mario_wing_tip_rgba16[] = "actors/mario/mario_wing_tip.rgba16";
 
 Gfx luigi_mario_wing_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_mario_wing_rgba16[] = "actors/mario/mario_wing.rgba16";
+ALIGNED8 static const u8 luigi_mario_wing_rgba16[] = "actors/mario/mario_wing.rgba16";
 
 Gfx luigi_fist_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_fist_rgba16[] = "actors/luigi/fist.rgba16";
+ALIGNED8 static const u8 luigi_fist_rgba16[] = "actors/luigi/fist.rgba16";
 
 Gfx luigi_openhand_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_openhand_rgba16[] = "actors/luigi/openhand.rgba16";
+ALIGNED8 static const u8 luigi_openhand_rgba16[] = "actors/luigi/openhand.rgba16";
 
 Gfx luigi_peace_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_peace_rgba16[] = "actors/luigi/peace.rgba16";
+ALIGNED8 static const u8 luigi_peace_rgba16[] = "actors/luigi/peace.rgba16";
 
 Gfx luigi_shoe_rgba16_aligner[] = {gsSPEndDisplayList()};
-u8 luigi_shoe_rgba16[] = "actors/luigi/shoe.rgba16";
+ALIGNED8 static const u8 luigi_shoe_rgba16[] = "actors/luigi/shoe.rgba16";
 
 Vtx luigi_000_offset_pelvis_mesh_vtx_0[87] = {
 	{{{41, -47, 56},0, {926, 71},{0x21, 0xA4, 0x52, 0xFF}}},
