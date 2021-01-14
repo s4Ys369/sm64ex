@@ -546,7 +546,7 @@ ifeq ($(BETTERCAMERA),1)
   EXT_OPTIONS_MENU := 1
 endif
 
-# Check for 60 fps option
+# Check for Model Pack option
 ifeq ($(MODELPACK),1)
   CC_CHECK += -DMODELPACK
   CFLAGS += -DMODELPACK
