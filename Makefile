@@ -66,6 +66,9 @@ CONTROLLER_API ?= SDL2
 LEGACY_RES ?= 0
 BASEDIR ?= res
 
+# Copy assets to BASEDIR? (useful for iterative debugging)
+NO_COPY ?= 0
+
 # Automatic settings for PC port(s)
 
 WINDOWS_BUILD ?= 0
@@ -99,6 +102,32 @@ ifeq ($(WINDOWS_BUILD),1)
     TARGET_ARCH = i386pe
     TARGET_BITS = 64
     NO_BZERO_BCOPY := 1
+  endif
+endif
+
+# macOS overrides
+ifeq ($(HOST_OS),Darwin)
+  OSX_BUILD := 1
+  # Using MacPorts?
+  ifeq ($(shell test -d /opt/local/lib && echo y),y)
+    OSX_GCC_VER = $(shell find /opt/local/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
+    CC := gcc-mp-$(OSX_GCC_VER)
+    CXX := g++-mp-$(OSX_GCC_VER)
+    CPP := cpp-mp-$(OSX_GCC_VER) -P
+    PLATFORM_CFLAGS := -I /opt/local/include
+    PLATFORM_LDFLAGS := -L /opt/local/lib
+  else
+    # Using Homebrew?
+    ifeq ($(shell which brew >/dev/null 2>&1 && echo y),y)
+      OSX_GCC_VER = $(shell find `brew --prefix`/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
+      CC := gcc-$(OSX_GCC_VER)
+      CXX := g++-$(OSX_GCC_VER)
+      CPP := cpp-$(OSX_GCC_VER) -P
+      PLATFORM_CFLAGS := -I /usr/local/include
+      PLATFORM_LDFLAGS := -L /usr/local/lib
+    else
+      $(error No suitable macOS toolchain found, have you installed Homebrew?)
+    endif
   endif
 endif
 
@@ -173,6 +202,7 @@ endif
 # in the makefile that we want should cover assets.)
 
 ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),cleantools)
 ifneq ($(MAKECMDGOALS),distclean)
 
 # Make sure assets exist
@@ -185,11 +215,12 @@ endif
 endif
 
 # Make tools if out of date
-DUMMY != make -C tools >&2 || echo FAIL
+DUMMY != CC=$(CC) CXX=$(CXX) $(MAKE) -C tools >&2 || echo FAIL
 ifeq ($(DUMMY),FAIL)
   $(error Failed to build tools)
 endif
 
+endif
 endif
 endif
 
@@ -366,7 +397,7 @@ DEP_FILES := $(O_FILES:.o=.d) $(ULTRA_O_FILES:.o=.d) $(GODDARD_O_FILES:.o=.d) $(
 SEG_FILES := $(SEGMENT_ELF_FILES) $(ACTOR_ELF_FILES) $(LEVEL_ELF_FILES)
 
 ##################### Compiler Options #######################
-INCLUDE_CFLAGS := -I include -I $(BUILD_DIR) -I $(BUILD_DIR)/include -I src -I .
+INCLUDE_CFLAGS := $(PLATFORM_CFLAGS) -I include -I $(BUILD_DIR) -I $(BUILD_DIR)/include -I src -I .
 ENDIAN_BITWIDTH := $(BUILD_DIR)/endian-and-bitwidth
 include Makefile_dynos
 
@@ -429,7 +460,6 @@ ifeq ($(WINDOWS_BUILD),1) # fixes compilation in MXE on Linux and WSL
   OBJCOPY := objcopy
   OBJDUMP := $(CROSS)objdump
 else ifeq ($(OSX_BUILD),1)
-  CPP := cpp-9 -P
   OBJDUMP := i686-w64-mingw32-objdump
   OBJCOPY := i686-w64-mingw32-objcopy
 else # Linux & other builds
@@ -590,7 +620,7 @@ else ifeq ($(TARGET_RPI),1)
   LDFLAGS := $(OPT_FLAGS) -lm $(BACKEND_LDFLAGS) -no-pie
 
 else ifeq ($(OSX_BUILD),1)
-  LDFLAGS := -lm $(BACKEND_LDFLAGS) -no-pie -lpthread
+  LDFLAGS := -lm $(PLATFORM_LDFLAGS) $(BACKEND_LDFLAGS) -lpthread
   
 else ifeq ($(TARGET_SWITCH),1)
   LDFLAGS := -specs=$(LIBNX)/switch.specs $(NXARCH) $(OPT_FLAGS) -no-pie -L$(LIBNX)/lib $(BACKEND_LDFLAGS) -lstdc++ -lnx -lm
@@ -626,13 +656,6 @@ ifeq ($(TARGET_SWITCH),1)
 all: $(EXE).nro
 endif
 
-# thank you apple very cool
-ifeq ($(HOST_OS),Darwin)
-  CP := gcp
-else
-  CP := cp
-endif
-
 BASEPACK_PATH := $(BUILD_DIR)/$(BASEDIR)/
 BASEPACK_LST := $(BUILD_DIR)/basepack.lst
 
@@ -645,7 +668,7 @@ res: $(BASEPACK_PATH)
 # prepares the basepack.lst
 $(BASEPACK_LST): $(EXE)
 	@mkdir -p $(BUILD_DIR)/$(BASEDIR)
-	@echo -n > $(BASEPACK_LST)
+	@touch $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/bank_sets sound/bank_sets" >> $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/sequences.bin sound/sequences.bin" >> $(BASEPACK_LST)
 	@echo "$(BUILD_DIR)/sound/sound_data.ctl sound/sound_data.ctl" >> $(BASEPACK_LST)
@@ -656,9 +679,11 @@ $(BASEPACK_LST): $(EXE)
 	@find textures -name \*.png -exec echo "{} gfx/{}" >> $(BASEPACK_LST) \;
 	@find texts -name \*.json -exec echo "{} {}" >> $(BASEPACK_LST) \;
 
+ifneq ($(NO_COPY),1)
 # prepares the resource ZIP with base data
 $(BASEPACK_PATH): $(BASEPACK_LST)
 	@$(PYTHON) $(TOOLS_DIR)/mkzip.py $(BASEPACK_LST) $(BASEPACK_PATH) $(LEGACY_RES)
+endif
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
