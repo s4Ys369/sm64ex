@@ -142,12 +142,9 @@ TARGET := sm64.$(VERSION)
 VERSION_CFLAGS := -D$(VERSION_DEF) -D_LANGUAGE_C
 VERSION_ASFLAGS := --defsym $(VERSION_DEF)=1
 
-# Stuff for showing the git hash in the intro
-# From https://stackoverflow.com/questions/44038428/include-git-commit-hash-and-or-branch-name-in-c-c-source
-GIT_HASH=`git rev-parse --short HEAD`
-GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-COMPILE_TIME=`date -u +'%Y-%m-%d %H:%M:%S UTC'`
-VERSION_CFLAGS += -DGIT_HASH="\"$(GIT_HASH)\"" -DCOMPILE_TIME="\"$(COMPILE_TIME)\""
+# Stuff for showing the git hash in the title bar
+GIT_HASH := $(shell git rev-parse --short HEAD)
+VERSION_CFLAGS += -DGIT_HASH="\"$(GIT_HASH)\""
 
 ifeq ($(shell git rev-parse --abbrev-ref HEAD),nightly)
   VERSION_CFLAGS += -DNIGHTLY
@@ -493,7 +490,7 @@ else ifeq ($(WINDOW_API),SDL2)
   else ifneq ($(TARGET_RPI)$(TARGET_SWITCH),00)
     BACKEND_LDFLAGS += -lGLESv2
   else ifeq ($(OSX_BUILD),1)
-    BACKEND_LDFLAGS += -framework OpenGL `pkg-config --libs glew`
+    BACKEND_LDFLAGS += -framework OpenGL $(shell pkg-config --libs glew)
   else
     BACKEND_LDFLAGS += -lGL
   endif
@@ -510,11 +507,11 @@ endif
 
 # SDL can be used by different systems, so we consolidate all of that shit into this
 ifeq ($(SDL_USED),2)
-  BACKEND_CFLAGS += -DHAVE_SDL2=1 `$(SDLCONFIG) --cflags`
+  BACKEND_CFLAGS += -DHAVE_SDL2=1 $(shell $(SDLCONFIG) --cflags)
   ifeq ($(WINDOWS_BUILD),1)
-    BACKEND_LDFLAGS += `$(SDLCONFIG) --static-libs` -lsetupapi -luser32 -limm32 -lole32 -loleaut32 -lshell32 -lwinmm -lversion
+    BACKEND_LDFLAGS += $(shell $(SDLCONFIG) --static-libs) -lsetupapi -luser32 -limm32 -lole32 -loleaut32 -lshell32 -lwinmm -lversion
   else
-    BACKEND_LDFLAGS += `$(SDLCONFIG) --libs`
+    BACKEND_LDFLAGS += $(shell $(SDLCONFIG) --libs)
   endif
 endif
 
