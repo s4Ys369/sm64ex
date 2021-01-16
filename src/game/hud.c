@@ -14,6 +14,7 @@
 #include "area.h"
 #include "save_file.h"
 #include "print.h"
+#include "engine/surface_load.h"
 #include "pc/configfile.h"
 
 #ifdef TARGET_SWITCH
@@ -730,6 +731,15 @@ void render_hud(void) {
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_TIMER && configHUD) {
             render_hud_timer();
+        }
+
+        if (gSurfacePoolError & NOT_ENOUGH_ROOM_FOR_SURFACES)
+        {
+            print_text(10, 40, "SURFACE POOL FULL");
+        }
+        if (gSurfacePoolError & NOT_ENOUGH_ROOM_FOR_NODES)
+        {
+            print_text(10, 60, "SURFACE NODE POOL FULL");
         }
 
         if( configHUD ) {
